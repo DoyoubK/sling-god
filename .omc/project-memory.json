@@ -1,0 +1,156 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1772350050571,
+  "projectRoot": "/Users/doyoubkwon/develop/saeChong-the-god",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "vite",
+        "version": "7.3.1",
+        "category": "build"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "vite",
+      "build": "tsc && vite build",
+      "preview": "vite preview"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "public",
+      "src"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 1,
+      "lastAccessed": 1772350050558,
+      "keyFiles": [
+        "vite.svg"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1772350050558,
+      "keyFiles": [
+        "counter.ts",
+        "main.ts",
+        "style.css",
+        "typescript.svg"
+      ]
+    },
+    "src/utils": {
+      "path": "src/utils",
+      "purpose": "Utility functions",
+      "fileCount": 1,
+      "lastAccessed": 1772350050562,
+      "keyFiles": [
+        "GameManager.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/scenes/GameScene.ts",
+      "accessCount": 2,
+      "lastAccessed": 1772350115098,
+      "type": "file"
+    },
+    {
+      "path": "src/scenes/MainMenuScene.ts",
+      "accessCount": 2,
+      "lastAccessed": 1772350119119,
+      "type": "file"
+    },
+    {
+      "path": "src/scenes/GameOverScene.ts",
+      "accessCount": 2,
+      "lastAccessed": 1772350125037,
+      "type": "file"
+    },
+    {
+      "path": "src/scenes/LevelUpScene.ts",
+      "accessCount": 2,
+      "lastAccessed": 1772350128976,
+      "type": "file"
+    },
+    {
+      "path": "TASK.md",
+      "accessCount": 1,
+      "lastAccessed": 1772350054569,
+      "type": "file"
+    },
+    {
+      "path": "src/main.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772350062916,
+      "type": "file"
+    },
+    {
+      "path": "src/constants/TDS.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772350074952,
+      "type": "file"
+    },
+    {
+      "path": "src/ui/Button.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772350083436,
+      "type": "file"
+    },
+    {
+      "path": "src/ui/HUD.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772350091650,
+      "type": "file"
+    },
+    {
+      "path": "src/ui/GaugeBar.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772350097068,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
