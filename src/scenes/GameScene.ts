@@ -281,7 +281,7 @@ export class GameScene extends Phaser.Scene {
     if (this.birds.length === 0) {
       this.birdSpawnTimer += delta
       const interval = this.gm.currentLevel === 1
-        ? 3000
+        ? 5000
         : Math.max(1200, 3000 - (this.gm.currentLevel - 2) * 200)
       if (this.birdSpawnTimer >= interval) {
         this.spawnBird(); this.birdSpawnTimer = 0
@@ -295,16 +295,15 @@ export class GameScene extends Phaser.Scene {
       if (bird.isOutOfBounds()) {
         bird.destroy(); this.birds.splice(i, 1)
         const result = this.gm.onMiss()
+        // 하트 소멸 시각 효과: 카메라 흔들림 + 빨간 플래시
+        this.cameras.main.shake(350, 0.012)
+        const { width, height } = this.scale
+        const flash = this.add.rectangle(width/2, height/2, width, height, 0xFF0000, 0.45).setDepth(50)
+        this.tweens.add({ targets: flash, alpha: 0, duration: 400, ease: 'Power2',
+          onComplete: () => flash.destroy() })
         this.hud.update(this.gm.currentLevel, this.gm.currentHits,
           this.gm.getTargetHits(this.gm.currentLevel), this.gm.currentMisses)
-        if (result === 'gameover') {
-          this.cameras.main.shake(350, 0.012)
-          const { width, height } = this.scale
-          const flash = this.add.rectangle(width/2, height/2, width, height, 0xFF0000, 0.45)
-          this.tweens.add({ targets: flash, alpha: 0, duration: 400, ease: 'Power2',
-            onComplete: () => { flash.destroy(); this.scene.start('GameOverScene') } })
-          return
-        }
+        if (result === 'gameover') { this.scene.start('GameOverScene'); return }
       }
     }
 
