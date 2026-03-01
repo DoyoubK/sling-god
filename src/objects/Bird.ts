@@ -17,7 +17,7 @@ interface BirdConfig {
 const BIRD_CONFIGS: Record<BirdType, BirdConfig> = {
   sparrow: { textureKey: 'bird_sparrow', bodyColor: 0x8B6914, wingColor: 0x6B4C0A, beakColor: 0xF59E0B, eyeColor: 0x191F28, displaySize: 72,  speedMult: 1.2,  hitRadius: 36 },
   eagle:   { textureKey: null,           bodyColor: 0x4A3728, wingColor: 0x6B4C3B, beakColor: 0xF59E0B, eyeColor: 0xEF4444, displaySize: 90,  speedMult: 0.85, hitRadius: 45 },
-  pigeon:  { textureKey: null,           bodyColor: 0x9CA3AF, wingColor: 0xE5E8EB, beakColor: 0xF59E0B, eyeColor: 0x191F28, displaySize: 78,  speedMult: 1.0,  hitRadius: 39 },
+  pigeon:  { textureKey: 'bird_pigeon',  bodyColor: 0x9CA3AF, wingColor: 0xE5E8EB, beakColor: 0xF59E0B, eyeColor: 0x191F28, displaySize: 78,  speedMult: 1.0,  hitRadius: 39 },
   parrot:  { textureKey: null,           bodyColor: 0x22C55E, wingColor: 0x16A34A, beakColor: 0xF59E0B, eyeColor: 0xEF4444, displaySize: 70,  speedMult: 1.1,  hitRadius: 35 },
   owl:     { textureKey: null,           bodyColor: 0x6B4C3B, wingColor: 0x4A3728, beakColor: 0xF59E0B, eyeColor: 0xF59E0B, displaySize: 88,  speedMult: 0.7,  hitRadius: 44 },
 }
