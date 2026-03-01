@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { drawBackground } from '../ui/SceneBackground'
 import { GameManager } from '../utils/GameManager'
 import { createButton } from '../ui/Button'
 import { TDS } from '../constants/TDS'
@@ -21,9 +22,7 @@ export class MainMenuScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale
 
-    this.drawSky(width, height)
-    this.drawClouds(width, height)
-    this.drawScenery(width, height)   // 사실적인 나무/풀밭
+    drawBackground(this)
     this.drawSlingshot(width, height)
     this.drawTitleCard(width, height)
     this.initFlyBird(width, height)
@@ -31,137 +30,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.cameras.main.fadeIn(450, 74, 150, 204)
   }
 
-  // ── 하늘 그라디언트 ──────────────────────────
-  private drawSky(w: number, h: number) {
-    const g = this.add.graphics().setDepth(0)
-    const skyH = h * 0.72
-    // 위(진한 파랑) → 아래(연한 하늘) 50단계
-    for (let i = 0; i < 50; i++) {
-      const t  = i / 50
-      const r  = Math.round(0x3A + (0x87 - 0x3A) * t)
-      const gv = Math.round(0x7A + (0xC8 - 0x7A) * t)
-      const b  = Math.round(0xBE + (0xF0 - 0xBE) * t)
-      g.fillStyle(Phaser.Display.Color.GetColor(r, gv, b))
-      g.fillRect(0, skyH / 50 * i, w, skyH / 50 + 1)
-    }
-    // 지면 색
-    g.fillStyle(0x5A8A3C); g.fillRect(0, skyH, w, h - skyH)
-  }
 
-  // ── 구름 (부드러운 원형) ─────────────────────
-  private drawClouds(w: number, _h: number) {
-    const clouds = [
-      { x: w*0.13, y: 55,  s: 1.1, spd: 14000 },
-      { x: w*0.58, y: 38,  s: 0.85,spd: 19000 },
-      { x: w*0.83, y: 80,  s: 0.65,spd: 24000 },
-      { x: w*0.35, y: 110, s: 0.5, spd: 20000 },
-    ]
-    clouds.forEach(c => {
-      const g = this.add.graphics().setDepth(1)
-      this.paintCloud(g, c.x, c.y, c.s)
-      this.tweens.add({ targets: g, x: `-=${18*c.s}`, duration: c.spd, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
-    })
-  }
-
-  private paintCloud(g: Phaser.GameObjects.Graphics, cx: number, cy: number, s: number) {
-    const r = 26 * s
-    g.fillStyle(0xFFFFFF, 0.92)
-    // 여러 원으로 뭉게구름 표현
-    const pts:[number,number,number][] = [[0,0,1],[r*0.9,-r*0.3,0.85],[-r*0.85,-r*0.25,0.8],[r*1.7,r*0.1,0.72],[-r*1.6,r*0.15,0.65],[r*0.3,-r*0.55,0.6]]
-    pts.forEach(([dx,dy,rs]) => { g.fillCircle(cx+dx, cy+dy, r*rs) })
-    // 하단 그림자
-    g.fillStyle(0xD0DFF0, 0.35)
-    g.fillEllipse(cx, cy+r*0.6, r*3.2, r*0.7)
-  }
-
-  // ── 사실적인 나무/풀 배경 ───────────────────
-  private drawScenery(w: number, h: number) {
-    const g   = this.add.graphics().setDepth(2)
-    const gy  = h * 0.72   // 지면 y
-
-    // ── 먼 배경 언덕 (3겹) ──
-    g.fillStyle(0x4A7A2E, 0.6)
-    g.fillEllipse(w*0.22, gy+10, w*0.55, 80)
-    g.fillStyle(0x3D6828, 0.7)
-    g.fillEllipse(w*0.78, gy+15, w*0.50, 70)
-    g.fillStyle(0x518C32, 0.5)
-    g.fillEllipse(w*0.5,  gy+5,  w*0.70, 90)
-
-    // ── 잔디 ──
-    g.fillStyle(0x5A8A3C); g.fillRect(0, gy, w, h-gy)
-    g.fillStyle(0x6AAA44); g.fillRect(0, gy, w, 6)
-    // 풀 디테일
-    for (let x = 0; x < w; x += 9) {
-      const h1 = 4 + (x*7%11)
-      g.fillStyle(0x7AC050); g.fillRect(x, gy-h1, 2, h1)
-      g.fillStyle(0x5A9038); g.fillRect(x+3, gy-h1*0.7, 2, h1*0.7)
-    }
-
-    // ── 왼쪽 큰 나무 ──
-    this.drawRealisticTree(g, w*0.08, gy, 1.15, 0)
-    this.drawRealisticTree(g, w*0.18, gy, 0.75, 1)
-
-    // ── 오른쪽 나무 ──
-    this.drawRealisticTree(g, w*0.88, gy, 1.2,  2)
-    this.drawRealisticTree(g, w*0.97, gy, 0.7,  0)
-
-    // ── 덤불 ──
-    this.drawBush(g, w*0.28, gy)
-    this.drawBush(g, w*0.72, gy)
-  }
-
-  private drawRealisticTree(g: Phaser.GameObjects.Graphics, x: number, groundY: number, scale: number, variant: number) {
-    const trunkH = (110 + variant*15) * scale
-    const trunkW = (14 + variant*2)  * scale
-
-    // 나무 기둥 (그라데이션 느낌 - 3겹)
-    g.fillStyle(0x4A2C0E); g.fillRect(x - trunkW*0.6, groundY - trunkH, trunkW*1.2, trunkH)
-    g.fillStyle(0x6B3E14); g.fillRect(x - trunkW*0.35, groundY - trunkH, trunkW*0.7, trunkH)
-    g.fillStyle(0x8B5220); g.fillRect(x - trunkW*0.15, groundY - trunkH*0.6, trunkW*0.25, trunkH*0.6)
-
-    // 뿌리 퍼짐
-    g.fillStyle(0x4A2C0E)
-    g.fillTriangle(x-trunkW*0.6, groundY, x-trunkW*1.8, groundY, x-trunkW*0.4, groundY-trunkH*0.15)
-    g.fillTriangle(x+trunkW*0.6, groundY, x+trunkW*1.8, groundY, x+trunkW*0.4, groundY-trunkH*0.15)
-
-    // 잎 군 (여러 원형 레이어)
-    const leafY  = groundY - trunkH
-    const radius = (55 + variant*12) * scale
-
-    // 그림자 레이어 (어두운 초록)
-    g.fillStyle(0x2A5A18)
-    g.fillCircle(x+radius*0.15, leafY+radius*0.2, radius*0.95)
-
-    // 메인 잎 레이어들
-    const leafColors = [0x3A7A20, 0x4A9028, 0x5AA832, 0x6AC03C]
-    const offsets: [number,number,number][] = [
-      [0, 0, 1.0],
-      [-radius*0.5, radius*0.15, 0.78],
-      [radius*0.5,  radius*0.1,  0.75],
-      [radius*0.1, -radius*0.35, 0.7],
-      [-radius*0.3,-radius*0.2,  0.62],
-      [radius*0.35,-radius*0.15, 0.6],
-    ]
-    offsets.forEach(([dx, dy, rs], i) => {
-      g.fillStyle(leafColors[Math.min(i, leafColors.length-1)])
-      g.fillCircle(x+dx, leafY+dy, radius*rs)
-    })
-
-    // 하이라이트 (밝은 초록, 빛 방향)
-    g.fillStyle(0x7AD840, 0.5)
-    g.fillCircle(x - radius*0.25, leafY - radius*0.3, radius*0.38)
-  }
-
-  private drawBush(g: Phaser.GameObjects.Graphics, x: number, groundY: number) {
-    g.fillStyle(0x2A5A18); g.fillCircle(x,      groundY-14, 22)
-    g.fillStyle(0x3A7A22); g.fillCircle(x-16,   groundY-10, 18)
-    g.fillStyle(0x3A7A22); g.fillCircle(x+18,   groundY-10, 16)
-    g.fillStyle(0x4A9028); g.fillCircle(x-6,    groundY-18, 16)
-    g.fillStyle(0x5AA030); g.fillCircle(x+8,    groundY-20, 14)
-    g.fillStyle(0x6AC03A, 0.6); g.fillCircle(x-8, groundY-22, 10)
-  }
-
-  // ── 새총 장식 ────────────────────────────────
   private drawSlingshot(w: number, h: number) {
     if (!this.textures.exists('saechong')) return
     const g   = this.add.graphics().setDepth(3)

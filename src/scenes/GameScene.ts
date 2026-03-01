@@ -1,10 +1,10 @@
 import Phaser from 'phaser'
+import { drawBackground } from '../ui/SceneBackground'
 import { GameManager } from '../utils/GameManager'
 import { Bird } from '../objects/Bird'
 import { Projectile } from '../objects/Projectile'
 import { HUD } from '../ui/HUD'
 import { GaugeBar } from '../ui/GaugeBar'
-import { TDS } from '../constants/TDS'
 
 const SLING_BASE_SPEED = 900
 const MAX_DRAG         = 130
@@ -78,7 +78,7 @@ export class GameScene extends Phaser.Scene {
     this.slingshotY = height - 18
 
     // 배경
-    this.add.rectangle(width / 2, height / 2, width, height, TDS.color.bg)
+    drawBackground(this)
 
     // 그래픽 레이어
     this.trajectoryGfx = this.add.graphics().setDepth(3)
@@ -280,7 +280,7 @@ export class GameScene extends Phaser.Scene {
     if (this.birds.length === 0) {
       this.birdSpawnTimer += delta
       const interval = this.gm.currentLevel === 1
-        ? 5000
+        ? 3000
         : Math.max(1200, 3000 - (this.gm.currentLevel - 2) * 200)
       if (this.birdSpawnTimer >= interval) {
         this.spawnBird(); this.birdSpawnTimer = 0
