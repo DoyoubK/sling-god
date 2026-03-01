@@ -33,6 +33,8 @@ export class Bird extends Phaser.GameObjects.Container {
   private leftWing!: Phaser.GameObjects.Graphics
   private rightWing!: Phaser.GameObjects.Graphics
   readonly hitRadius: number
+  isHit: boolean = false
+  private xEyesGfx?: Phaser.GameObjects.Graphics
 
   constructor(scene: Phaser.Scene, x: number, y: number, speed: number) {
     super(scene, x, y)
@@ -173,6 +175,7 @@ export class Bird extends Phaser.GameObjects.Container {
   }
 
   update(delta: number) {
+    if (this.isHit) return
     const dt = delta / 1000
 
     if (this.pattern === 'zigzag') {
@@ -194,5 +197,37 @@ export class Bird extends Phaser.GameObjects.Container {
   isOutOfBounds(): boolean {
     const h = this.scene.scale.height
     return this.x < -80 || this.y < -80 || this.y > h + 80
+  }
+
+  // ── 명중 시 눈이 X로 변하고 땅으로 떨어지는 애니메이션 ──
+  playHitAnimation(onComplete: () => void) {
+    this.isHit = true
+    this.vx = 0; this.vy = 0
+
+    // X 눈 오버레이
+    const r = this.cfg.radius
+    this.xEyesGfx = this.scene.add.graphics()
+    this.xEyesGfx.lineStyle(3, 0xFF2222, 1)
+
+    // 왼쪽 X 눈
+    const lx = r * 0.3, ly = -r * 0.2, er = r * 0.22
+    this.xEyesGfx.beginPath(); this.xEyesGfx.moveTo(lx - er, ly - er); this.xEyesGfx.lineTo(lx + er, ly + er); this.xEyesGfx.strokePath()
+    this.xEyesGfx.beginPath(); this.xEyesGfx.moveTo(lx + er, ly - er); this.xEyesGfx.lineTo(lx - er, ly + er); this.xEyesGfx.strokePath()
+
+    this.add(this.xEyesGfx)
+    this.setDepth(15)
+
+    const targetY = this.scene.scale.height + 60
+    this.scene.tweens.add({
+      targets: this,
+      y: targetY,
+      angle: this.x > this.scene.scale.width / 2 ? 90 : -90,
+      duration: 700,
+      ease: 'Power2.easeIn',
+      onComplete: () => {
+        this.destroy()
+        onComplete()
+      },
+    })
   }
 }

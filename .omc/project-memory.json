@@ -93,8 +93,14 @@
   "hotPaths": [
     {
       "path": "src/scenes/GameScene.ts",
-      "accessCount": 2,
-      "lastAccessed": 1772350115098,
+      "accessCount": 10,
+      "lastAccessed": 1772362500656,
+      "type": "file"
+    },
+    {
+      "path": "src/objects/Bird.ts",
+      "accessCount": 5,
+      "lastAccessed": 1772362500262,
       "type": "file"
     },
     {
@@ -149,6 +155,18 @@
       "path": "src/ui/GaugeBar.ts",
       "accessCount": 1,
       "lastAccessed": 1772350097068,
+      "type": "file"
+    },
+    {
+      "path": "src/objects/Projectile.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772362429211,
+      "type": "file"
+    },
+    {
+      "path": "src/utils/GameManager.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772362430475,
       "type": "file"
     }
   ],
