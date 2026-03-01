@@ -60,6 +60,7 @@ export class GameScene extends Phaser.Scene {
   constructor() { super({ key: 'GameScene' }) }
 
   preload() {
+    if (!this.textures.exists('bird_sparrow')) { this.load.image('bird_sparrow', 'assets/bird_sparrow.png') }
     if (!this.textures.exists('birdgun'))
       this.load.image('birdgun', 'assets/birdgun.png')
   }
