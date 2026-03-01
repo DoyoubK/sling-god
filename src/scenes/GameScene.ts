@@ -7,8 +7,17 @@ import { GaugeBar } from '../ui/GaugeBar'
 import { TDS } from '../constants/TDS'
 
 const SLING_BASE_SPEED = 520
-const MAX_DRAG        = 140
-const GRAVITY         = 320
+const MAX_DRAG         = 130
+const GRAVITY          = 320
+
+// saechong.png (2048x2048) 기준 갈래 끝 픽셀 좌표 (실측값)
+const IMG_SIZE          = 2048
+const IMG_ORIGIN_X      = 0.5    // setOrigin x
+const IMG_ORIGIN_Y      = 0.84   // setOrigin y (손잡이 하단 기준)
+const LEFT_FORK_IMG_X   = 910
+const LEFT_FORK_IMG_Y   = 310    // 갈래 끝에서 고무줄 묶이는 위치
+const RIGHT_FORK_IMG_X  = 1524
+const RIGHT_FORK_IMG_Y  = 310
 
 export class GameScene extends Phaser.Scene {
   private gm!: GameManager
@@ -18,22 +27,34 @@ export class GameScene extends Phaser.Scene {
   private hud!: HUD
   private gaugeBar!: GaugeBar
 
+  // 새총 이미지
+  private slingshotImg!: Phaser.GameObjects.Image
+  private imgScale!: number
   private slingshotX!: number
   private slingshotY!: number
+
+  // 계산된 갈래 끝 화면 좌표 (imgToScreen 결과)
+  private leftForkX!:  number
+  private leftForkY!:  number
+  private rightForkX!: number
+  private rightForkY!: number
+
+  // 돌 기본 위치 (갈래 중간)
+  private stoneRestX!: number
+  private stoneRestY!: number
 
   // 드래그 상태
   private wasDown    = false
   private dragStartX = 0
   private dragStartY = 0
-  private dragVx     = 0
-  private dragVy     = 0
-  private dragPower  = 0
   private isDragging = false
+  private stoneX!: number   // 현재 돌 위치
+  private stoneY!: number
+  private dragPower  = 0
 
   // 그래픽
-  private slingshotImg!:  Phaser.GameObjects.Image
-  private trajectoryGfx!: Phaser.GameObjects.Graphics
   private rubberGfx!:     Phaser.GameObjects.Graphics
+  private trajectoryGfx!: Phaser.GameObjects.Graphics
 
   // 새 스폰
   private birdSpawnTimer    = 0
@@ -55,74 +76,100 @@ export class GameScene extends Phaser.Scene {
 
     const { width, height } = this.scale
     this.slingshotX = width / 2
-    this.slingshotY = height - 100
+    this.slingshotY = height - 60
 
     // 배경
     this.add.rectangle(width / 2, height / 2, width, height, TDS.color.bg)
 
-    // 그래픽 레이어
+    // 그래픽 레이어 (새총 뒤/앞)
     this.trajectoryGfx = this.add.graphics().setDepth(3)
-    this.rubberGfx     = this.add.graphics().setDepth(6)
+    this.rubberGfx     = this.add.graphics().setDepth(7)  // 이미지보다 앞
 
-    // 새총 이미지 (하단 중앙)
-    const imgDisplaySize = width * 0.38
-    const imgScale = imgDisplaySize / 2048
+    // 새총 이미지 배치
+    const imgDisplayW = width * 0.46
+    this.imgScale = imgDisplayW / IMG_SIZE
+
     this.slingshotImg = this.add.image(this.slingshotX, this.slingshotY, 'saechong')
-      .setScale(imgScale)
+      .setScale(this.imgScale)
+      .setOrigin(IMG_ORIGIN_X, IMG_ORIGIN_Y)
       .setDepth(5)
-      .setOrigin(0.5, 0.82)  // 손잡이 하단 기준으로 위치
 
-    // 고무줄 + 돌 (이미지 위에 덮어서 표현)
-    this.rubberGfx.setDepth(6)
+    // 갈래 끝 화면 좌표 계산
+    this.calcForkPositions()
 
+    // 돌 기본 위치 = 갈래 중간 + 약간 아래 (파우치)
+    this.stoneRestX = (this.leftForkX + this.rightForkX) / 2
+    this.stoneRestY = (this.leftForkY + this.rightForkY) / 2 + 14
+    this.stoneX = this.stoneRestX
+    this.stoneY = this.stoneRestY
+
+    // UI
     this.hud = new HUD(this)
     this.hud.update(this.gm.currentLevel, this.gm.currentHits,
       this.gm.getTargetHits(this.gm.currentLevel), this.gm.currentMisses)
     this.gaugeBar = new GaugeBar(this)
 
-    this.drawRubber(0, 0)
+    this.drawRubber()
   }
 
-  // ── 발사 포인트 (새총 갈래 사이) ──
-  private get forkX() { return this.slingshotX }
-  private get forkY() { return this.slingshotY - this.slingshotImg.displayHeight * 0.52 }
+  // ── 이미지 픽셀 → 화면 좌표 변환 ──
+  private imgToScreen(imgX: number, imgY: number): { x: number; y: number } {
+    const anchorImgX = IMG_SIZE * IMG_ORIGIN_X
+    const anchorImgY = IMG_SIZE * IMG_ORIGIN_Y
+    return {
+      x: this.slingshotX + (imgX - anchorImgX) * this.imgScale,
+      y: this.slingshotY + (imgY - anchorImgY) * this.imgScale,
+    }
+  }
+
+  private calcForkPositions() {
+    const L = this.imgToScreen(LEFT_FORK_IMG_X,  LEFT_FORK_IMG_Y)
+    const R = this.imgToScreen(RIGHT_FORK_IMG_X, RIGHT_FORK_IMG_Y)
+    this.leftForkX  = L.x; this.leftForkY  = L.y
+    this.rightForkX = R.x; this.rightForkY = R.y
+  }
 
   // ── 고무줄 + 돌 그리기 ──
-  private drawRubber(offsetX: number, offsetY: number) {
+  private drawRubber() {
     const rb = this.rubberGfx
     rb.clear()
 
-    const fx = this.forkX
-    const fy = this.forkY
-    // 이미지 기반 갈래 끝 위치 (이미지 비율로 추정)
-    const imgW = this.slingshotImg.displayWidth
-    const leftX  = fx - imgW * 0.12
-    const rightX = fx + imgW * 0.12
-    const forkTopY = fy - this.slingshotImg.displayHeight * 0.08
+    const sx = this.stoneX
+    const sy = this.stoneY
 
-    rb.lineStyle(3, 0x3A2010, 0.95)
+    // 고무줄 (갈래끝 → 돌)
+    rb.lineStyle(3.5, 0x2A1A0A, 0.95)
+    rb.beginPath(); rb.moveTo(this.leftForkX,  this.leftForkY);  rb.lineTo(sx, sy); rb.strokePath()
+    rb.beginPath(); rb.moveTo(this.rightForkX, this.rightForkY); rb.lineTo(sx, sy); rb.strokePath()
 
-    if (this.isDragging) {
-      const bx = fx + offsetX
-      const by = fy + offsetY
-      rb.beginPath(); rb.moveTo(leftX,  forkTopY); rb.lineTo(bx, by); rb.strokePath()
-      rb.beginPath(); rb.moveTo(rightX, forkTopY); rb.lineTo(bx, by); rb.strokePath()
-      // 돌멩이
-      rb.fillStyle(0x707880); rb.fillRect(bx - 9, by - 9, 18, 18)
-      rb.fillStyle(0x909AA0); rb.fillRect(bx - 7, by - 7, 12, 10)
-      rb.fillStyle(0xB0B8C0); rb.fillRect(bx - 5, by - 5, 6, 5)
-      // 불꽃
-      rb.fillStyle(0xF8D848); rb.fillRect(bx - 4, by - 16, 8, 8)
-      rb.fillStyle(0xF8A030); rb.fillRect(bx - 3, by - 12, 6, 6)
-      rb.fillStyle(0xE86420); rb.fillRect(bx - 2, by - 9,  4, 4)
-    } else {
-      // 기본 (장전 대기 상태)
-      const stoneX = fx, stoneY = fy + 4
-      rb.beginPath(); rb.moveTo(leftX,  forkTopY); rb.lineTo(stoneX, stoneY); rb.strokePath()
-      rb.beginPath(); rb.moveTo(rightX, forkTopY); rb.lineTo(stoneX, stoneY); rb.strokePath()
-      rb.fillStyle(0x707880); rb.fillRect(stoneX - 8, stoneY - 8, 16, 16)
-      rb.fillStyle(0x909AA0); rb.fillRect(stoneX - 6, stoneY - 6, 10, 9)
-      rb.fillStyle(0xB0B8C0); rb.fillRect(stoneX - 4, stoneY - 4, 5, 4)
+    // 고무줄 안쪽 하이라이트
+    rb.lineStyle(1.5, 0x6B3A1A, 0.6)
+    rb.beginPath(); rb.moveTo(this.leftForkX,  this.leftForkY);  rb.lineTo(sx, sy); rb.strokePath()
+    rb.beginPath(); rb.moveTo(this.rightForkX, this.rightForkY); rb.lineTo(sx, sy); rb.strokePath()
+
+    // 파우치 (돌 주머니)
+    rb.fillStyle(0x3A1A08)
+    rb.fillRect(sx - 7, sy - 2, 14, 9)
+    rb.fillStyle(0x5C2E12)
+    rb.fillRect(sx - 5, sy - 1, 10, 6)
+
+    // 돌멩이
+    rb.fillStyle(0x5A6068); rb.fillRect(sx - 8, sy - 9, 16, 16)
+    rb.fillStyle(0x7A8490); rb.fillRect(sx - 6, sy - 7, 11, 11)
+    rb.fillStyle(0x9AAAB4); rb.fillRect(sx - 4, sy - 6,  6,  6)
+    rb.fillStyle(0xB8C8D0); rb.fillRect(sx - 3, sy - 5,  3,  3)  // 하이라이트
+
+    // 드래그 중이면 불꽃
+    if (this.isDragging && this.dragPower > 0.15) {
+      const fp = this.dragPower
+      rb.fillStyle(0xF8D848, fp); rb.fillRect(sx - 4, sy - 16, 8, 9)
+      rb.fillStyle(0xF8A030, fp); rb.fillRect(sx - 3, sy - 13, 6, 7)
+      rb.fillStyle(0xE86420, fp); rb.fillRect(sx - 2, sy - 10, 4, 5)
+      // 스파크
+      rb.fillStyle(0xFFFFCC, fp * 0.8)
+      rb.fillRect(sx - 9, sy - 14, 2, 2)
+      rb.fillRect(sx + 7, sy - 12, 2, 2)
+      rb.fillRect(sx - 6, sy - 18, 2, 2)
     }
   }
 
@@ -131,29 +178,35 @@ export class GameScene extends Phaser.Scene {
     const g = this.trajectoryGfx
     g.clear()
     if (!this.isDragging || this.dragPower < 0.05) return
-    let px = this.forkX, py = this.forkY
+    let px = this.stoneX, py = this.stoneY
     let pvx = vx, pvy = vy
     const dt = 0.05
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 28; i++) {
       pvy += GRAVITY * dt; px += pvx * dt; py += pvy * dt
       if (py > this.scale.height + 50 || px < -50 || px > this.scale.width + 50) break
       if (i % 2 === 0) {
-        g.fillStyle(0xF8A030, (1 - i / 30) * 0.8)
-        g.fillCircle(px, py, Math.max(2, 4 - i * 0.08))
+        const alpha = (1 - i / 28) * 0.75
+        g.fillStyle(0xF8A030, alpha)
+        g.fillCircle(px, py, Math.max(2, 4 - i * 0.1))
       }
     }
   }
 
   // ── 발사 ──
   private fire(vx: number, vy: number) {
-    this.projectiles.push(new Projectile(this, this.forkX, this.forkY, vx, vy))
+    this.projectiles.push(new Projectile(this, this.stoneX, this.stoneY, vx, vy))
+    // 발사 시 새총 반동 애니메이션
+    this.tweens.add({
+      targets: this.slingshotImg,
+      angle: -4, duration: 80, yoyo: true, ease: 'Power2',
+    })
   }
 
   // ── 스폰 ──
   private spawnBird() {
     const { width } = this.scale
-    this.birds.push(new Bird(this, width + 50, Phaser.Math.Between(110, 620),
-      this.gm.getBirdSpeed(this.gm.currentLevel)))
+    this.birds.push(new Bird(this, width + 50,
+      Phaser.Math.Between(100, 600), this.gm.getBirdSpeed(this.gm.currentLevel)))
   }
 
   // ── 명중 이펙트 ──
@@ -162,8 +215,7 @@ export class GameScene extends Phaser.Scene {
     g.fillStyle(0xF8A030, 0.8); g.fillCircle(0, 0, 28); g.setPosition(x, y)
     const txt = this.add.text(x, y - 20, '💥', { fontSize: '28px' }).setOrigin(0.5).setDepth(21)
     this.tweens.add({
-      targets: [g, txt], alpha: 0, scaleX: 2.2, scaleY: 2.2,
-      duration: 380, ease: 'Power2',
+      targets: [g, txt], alpha: 0, scaleX: 2.2, scaleY: 2.2, duration: 380, ease: 'Power2',
       onComplete: () => { g.destroy(); txt.destroy() },
     })
   }
@@ -176,34 +228,65 @@ export class GameScene extends Phaser.Scene {
     if (isDown && !this.wasDown) {
       this.isDragging = true
       this.dragStartX = ptr.x; this.dragStartY = ptr.y
-      this.dragVx = 0; this.dragVy = 0; this.dragPower = 0
+      this.dragPower  = 0
     }
 
     if (isDown && this.isDragging) {
       const dx   = ptr.x - this.dragStartX
       const dy   = ptr.y - this.dragStartY
-      const dist = Math.min(Math.sqrt(dx * dx + dy * dy), MAX_DRAG)
-      this.dragPower = dist / MAX_DRAG
-      if (dist > 2) {
-        const angle = Math.atan2(dy, dx)
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      const clamped = Math.min(dist, MAX_DRAG)
+      this.dragPower = clamped / MAX_DRAG
+
+      if (dist > 1) {
+        const nx = dx / dist   // 정규화
+        const ny = dy / dist
+        // 돌 위치 = 기본 위치에서 드래그 방향으로 이동 (반대방향 = 당기는 방향)
+        this.stoneX = this.stoneRestX + nx * clamped
+        this.stoneY = this.stoneRestY + ny * clamped
+
+        // 발사 벡터 = 당긴 반대 방향
         const speed = this.dragPower * SLING_BASE_SPEED
-        this.dragVx = -Math.cos(angle) * speed
-        this.dragVy = -Math.sin(angle) * speed
-        const r = dist / Math.sqrt(dx * dx + dy * dy)
-        this.drawRubber(dx * r * (dist / MAX_DRAG) * 0.65, dy * r * (dist / MAX_DRAG) * 0.65)
-        this.drawTrajectory(this.dragVx, this.dragVy)
+        const vx    = -nx * speed
+        const vy    = -ny * speed
+
+        this.drawRubber()
+        this.drawTrajectory(vx, vy)
         this.gaugeBar.setPower(this.dragPower * 100)
 
-        // 새총 이미지 조준 방향으로 약간 기울기
-        const tiltAngle = Phaser.Math.RadToDeg(Math.atan2(dy, dx)) * 0.08
-        this.slingshotImg.setAngle(Phaser.Math.Clamp(tiltAngle, -12, 12))
+        // 새총 이미지 기울기 (살짝만)
+        const tilt = Phaser.Math.Clamp(dx * 0.03, -8, 8)
+        this.slingshotImg.setAngle(tilt)
       }
     }
 
     if (!isDown && this.wasDown && this.isDragging) {
-      if (this.dragPower > 0.04) this.fire(this.dragVx, this.dragVy)
+      if (this.dragPower > 0.04) {
+        const dx = this.stoneX - this.stoneRestX
+        const dy = this.stoneY - this.stoneRestY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        const speed = this.dragPower * SLING_BASE_SPEED
+        const vx = -(dx / dist) * speed
+        const vy = -(dy / dist) * speed
+        this.fire(vx, vy)
+      }
+      // 돌 복귀 애니메이션
+      this.tweens.add({
+        targets: { x: this.stoneX, y: this.stoneY },
+        x: this.stoneRestX, y: this.stoneRestY,
+        duration: 120, ease: 'Power2',
+        onUpdate: (tween) => {
+          const t = tween.targets[0] as { x: number; y: number }
+          this.stoneX = t.x; this.stoneY = t.y
+          this.drawRubber()
+        },
+        onComplete: () => {
+          this.stoneX = this.stoneRestX; this.stoneY = this.stoneRestY
+          this.drawRubber()
+        },
+      })
+
       this.isDragging = false; this.dragPower = 0
-      this.drawRubber(0, 0)
       this.trajectoryGfx.clear()
       this.gaugeBar.setPower(0)
       this.slingshotImg.setAngle(0)
@@ -218,7 +301,7 @@ export class GameScene extends Phaser.Scene {
       this.birdSpawnInterval = Math.max(700, this.birdSpawnInterval - 40)
     }
 
-    // 새 업데이트
+    // 새 업데이트 + 경계 이탈
     for (let i = this.birds.length - 1; i >= 0; i--) {
       const bird = this.birds[i]
       bird.update(delta)
