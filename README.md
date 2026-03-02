@@ -55,16 +55,23 @@
 
 ## 🚀 시작하기
 
-\`\`\`bash
+```bash
+# 저장소 클론
+git clone https://github.com/DoyoubK/sling-god.git
+cd sling-god
+
 # 의존성 설치
 npm install
 
-# 개발 서버 실행
+# 개발 서버 실행 (http://localhost:5173)
 npm run dev
 
-# 프로덕션 빌드
+# 타입 체크 + 프로덕션 빌드
 npm run build
-\`\`\`
+
+# 빌드 결과물 로컬 미리보기
+npm run preview
+```
 
 ## 📁 프로젝트 구조
 
