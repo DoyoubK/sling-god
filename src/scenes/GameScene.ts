@@ -4,7 +4,6 @@ import { GameManager } from '../utils/GameManager'
 import { Bird } from '../objects/Bird'
 import { Projectile } from '../objects/Projectile'
 import { HUD } from '../ui/HUD'
-import { GaugeBar } from '../ui/GaugeBar'
 
 const SLING_BASE_SPEED = 900
 const MAX_DRAG         = 130
@@ -25,7 +24,6 @@ export class GameScene extends Phaser.Scene {
   private birds: Bird[] = []
   private projectiles: Projectile[] = []
   private hud!: HUD
-  private gaugeBar!: GaugeBar
 
   // 새총
   private slingshotImg!: Phaser.GameObjects.Image
@@ -52,6 +50,7 @@ export class GameScene extends Phaser.Scene {
 
   // 그래픽
   private rubberGfx!:     Phaser.GameObjects.Graphics
+  private arcGaugeGfx!:   Phaser.GameObjects.Graphics
   private trajectoryGfx!: Phaser.GameObjects.Graphics
 
   // 스폰
@@ -107,7 +106,7 @@ export class GameScene extends Phaser.Scene {
     this.hud = new HUD(this)
     this.hud.update(this.gm.currentLevel, this.gm.currentHits,
       this.gm.getTargetHits(this.gm.currentLevel), this.gm.currentMisses)
-    this.gaugeBar = new GaugeBar(this)
+    this.arcGaugeGfx = this.add.graphics().setDepth(8)
 
     this.drawRubber()
   }
@@ -166,6 +165,49 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  // ── 새총 위 반원 게이지 ─────────────────────────
+  private drawArcGauge(power: number) {
+    const g = this.arcGaugeGfx
+    g.clear()
+    if (power < 0.03) return
+
+    // 새총 포크 중앙 위쪽에 반원 게이지
+    const cx = (this.lfx + this.rfx) / 2
+    const cy = (this.lfy + this.rfy) / 2 - 10
+    const R  = 38
+
+    // 배경 트랙 (반원)
+    g.lineStyle(5, 0x000000, 0.15)
+    g.beginPath()
+    g.arc(cx, cy, R, Phaser.Math.DegToRad(180), Phaser.Math.DegToRad(360), false)
+    g.strokePath()
+
+    // 채워진 게이지 (파워에 따라 색상 변화)
+    const pct    = Math.min(power, 1)
+    const endDeg = 180 + pct * 180
+    const color  = pct < 0.4 ? 0x44CC44
+                 : pct < 0.7 ? 0xFFAA00
+                 :              0xFF3322
+
+    g.lineStyle(5, color, 0.92)
+    g.beginPath()
+    g.arc(cx, cy, R, Phaser.Math.DegToRad(180), Phaser.Math.DegToRad(endDeg), false)
+    g.strokePath()
+
+    // 끝 점 (현재 파워 위치 동그라미)
+    const endRad = Phaser.Math.DegToRad(endDeg)
+    const ex = cx + Math.cos(endRad) * R
+    const ey = cy + Math.sin(endRad) * R
+    g.fillStyle(color, 1)
+    g.fillCircle(ex, ey, 4)
+
+    // 파워 수치 (중앙 텍스트 대신 작은 점)
+    if (pct > 0.1) {
+      g.fillStyle(color, 0.7)
+      g.fillCircle(cx, cy - R - 8, 3)
+    }
+  }
+
   // ── 점선 궤적 ────────────────────────────────
   private drawTrajectory(vx: number, vy: number) {
     const g = this.trajectoryGfx
@@ -178,8 +220,8 @@ export class GameScene extends Phaser.Scene {
     for (let i = 0; i < steps; i++) {
       pvy += GRAVITY * dt; px += pvx * dt; py += pvy * dt
       if (py > this.scale.height + 50 || px < -50 || px > this.scale.width + 50) break
-      g.fillStyle(0xF8A030, (1 - i / steps) * 0.72)
-      g.fillCircle(px, py, Math.max(1.5, 3.5 - i * 0.04))
+      g.fillStyle(0xFF5500, (1 - i / steps) * 0.90)
+      g.fillCircle(px, py, Math.max(2, 4 - i * 0.04))
     }
   }
 
@@ -287,7 +329,7 @@ export class GameScene extends Phaser.Scene {
         this.drawRubber()
         this.drawTrajectory(-nx * this.dragPower * SLING_BASE_SPEED,
                             -ny * this.dragPower * SLING_BASE_SPEED)
-        this.gaugeBar.setPower(this.dragPower * 100)
+        this.drawArcGauge(this.dragPower)
         this.slingshotImg.setAngle(Phaser.Math.Clamp(dx * 0.025, -7, 7))
       }
     }
@@ -318,7 +360,7 @@ export class GameScene extends Phaser.Scene {
       })
       this.isDragging = false; this.dragPower = 0
       this.trajectoryGfx.clear()
-      this.gaugeBar.setPower(0)
+      this.drawArcGauge(0)
       this.slingshotImg.setAngle(0)
     }
 

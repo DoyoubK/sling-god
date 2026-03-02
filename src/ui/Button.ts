@@ -23,22 +23,39 @@ const COLORS: Record<ButtonVariant, { normal: number; hover: number; text: strin
 export function createButton(options: ButtonOptions): Phaser.GameObjects.Container {
   const { scene, x, y, width = 280, height = 56, label, variant = 'primary', onClick } = options
   const c = COLORS[variant]
+  const radius = height / 2  // 완전한 pill 모양
 
-  const bg = scene.add.rectangle(0, 0, width, height, c.normal)
+  const drawBg = (g: Phaser.GameObjects.Graphics, color: number) => {
+    g.clear()
+    // 그림자
+    g.fillStyle(0x000000, 0.18)
+    g.fillRoundedRect(-width/2 + 2, -height/2 + 4, width, height, radius)
+    // 본체
+    g.fillStyle(color)
+    g.fillRoundedRect(-width/2, -height/2, width, height, radius)
+    // 상단 하이라이트
+    g.fillStyle(0xFFFFFF, 0.18)
+    g.fillRoundedRect(-width/2 + 6, -height/2 + 4, width - 12, height * 0.38, radius)
+  }
+
+  const bg = scene.add.graphics()
+  drawBg(bg, c.normal)
+
+  const hitZone = scene.add.rectangle(0, 0, width, height, 0x000000, 0)
     .setInteractive({ useHandCursor: true })
 
-  const text = scene.add.text(0, 0, label, {
+  const text = scene.add.text(0, 1, label, {
     fontSize: '18px',
     fontFamily: TDS.font.family,
     color: c.text,
     fontStyle: 'bold',
   }).setOrigin(0.5)
 
-  const container = scene.add.container(x, y, [bg, text])
+  const container = scene.add.container(x, y, [bg, hitZone, text])
 
-  bg.on('pointerdown', onClick)
-  bg.on('pointerover', () => bg.setFillStyle(c.hover))
-  bg.on('pointerout',  () => bg.setFillStyle(c.normal))
+  hitZone.on('pointerdown', onClick)
+  hitZone.on('pointerover',  () => drawBg(bg, c.hover))
+  hitZone.on('pointerout',   () => drawBg(bg, c.normal))
 
   return container
 }

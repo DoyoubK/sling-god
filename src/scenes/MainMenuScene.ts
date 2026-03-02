@@ -42,7 +42,7 @@ export class MainMenuScene extends Phaser.Scene {
     g.fillEllipse(sx - w*0.02, sy+4, w*0.14, 10)
 
     const img = this.add.image(sx - w*0.02, sy, 'saechong')
-      .setDisplaySize(w*0.28, w*0.28)
+      .setDisplaySize(w*0.44, w*0.44)
       .setOrigin(0.5, 0.93)
       .setDepth(4)
 

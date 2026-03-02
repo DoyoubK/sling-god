@@ -73,13 +73,7 @@ export class LevelUpScene extends Phaser.Scene {
     }).setOrigin(0.5).setAlpha(0)
     .setDepth(1)
 
-    const speedLabel = gm.currentLevel > 1
-      ? `새 속도 +${(gm.currentLevel - 1) * 30}`
-      : '기본 속도'
-    this.add.text(width/2, cardY + 32, `🐦 ${speedLabel}`, {
-      fontSize: '15px', fontFamily: TDS.font.family, color: '#90B8E8',
-    }).setOrigin(0.5).setAlpha(0)
-    .setDepth(1)
+
 
     // 카드 안 텍스트 딜레이 처리
     this.time.delayedCall(350, () => {
