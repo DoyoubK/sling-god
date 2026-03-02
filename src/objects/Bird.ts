@@ -34,7 +34,7 @@ export class Bird extends Phaser.GameObjects.Container {
   readonly hitRadius: number
   isHit = false
 
-  constructor(scene: Phaser.Scene, x: number, y: number, speed: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, speed: number, goRight = false) {
     super(scene, x, y)
     scene.add.existing(this)
 
@@ -48,13 +48,18 @@ export class Bird extends Phaser.GameObjects.Container {
     const patterns: BirdPattern[] = ['straight', 'zigzag', 'dive', 'accelerate']
     this.pattern = patterns[Phaser.Math.Between(0, patterns.length - 1)]
 
-    const s = speed * this.cfg.speedMult
+    const dir = goRight ? 1 : -1
+    const s   = speed * this.cfg.speedMult
     switch (this.pattern) {
-      case 'straight':   this.vx = -s;       this.vy = 0; break
-      case 'zigzag':     this.vx = -s * 0.8; this.vy = 0; break
-      case 'dive':       this.vx = -s * 0.9; this.vy = s * 0.3; break
-      case 'accelerate': this.vx = -s * 0.6; this.vy = 0; break
+      case 'straight':   this.vx = dir * s;       this.vy = 0; break
+      case 'zigzag':     this.vx = dir * s * 0.8; this.vy = 0; break
+      case 'dive':       this.vx = dir * s * 0.9; this.vy = s * 0.3; break
+      case 'accelerate': this.vx = dir * s * 0.6; this.vy = 0; break
     }
+
+    // 날아가는 방향으로 머리가 향하도록 (기본 드로잉은 오른쪽 방향)
+    // 왼쪽으로 날 때: scaleX -1 로 미러
+    this.setScale(goRight ? 1 : -1, 1)
 
     // 그래픽 레이어: 아랫날개 → 몸통 → 윗날개
     this.wingBotGfx = scene.add.graphics()
@@ -414,8 +419,8 @@ export class Bird extends Phaser.GameObjects.Container {
   }
 
   isOutOfBounds(): boolean {
-    const h = this.scene.scale.height
-    return this.x < -100 || this.y < -100 || this.y > h + 100
+    const { width, height } = this.scene.scale
+    return this.x < -100 || this.x > width + 100 || this.y < -100 || this.y > height + 100
   }
 
   playHitAnimation(onComplete: () => void) {

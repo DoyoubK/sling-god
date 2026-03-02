@@ -172,7 +172,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.isDragging || this.dragPower < 0.05) return
     let px = this.stoneX, py = this.stoneY
     let pvx = vx, pvy = vy
-    const dt = 0.02
+    const dt = 0.029
     const steps = 70
     for (let i = 0; i < steps; i++) {
       pvy += GRAVITY * dt; px += pvx * dt; py += pvy * dt
@@ -193,10 +193,13 @@ export class GameScene extends Phaser.Scene {
 
   // ── 새 스폰 ──────────────────────────────────
   private spawnBird() {
-    this.birds.push(new Bird(this,
-      this.scale.width + 50,
+    const goRight = Math.random() < 0.3   // 30% 확률로 왼→오
+    const x = goRight ? -50 : this.scale.width + 50
+    const bird = new Bird(this, x,
       Phaser.Math.Between(100, 600),
-      this.gm.getBirdSpeed(this.gm.currentLevel)))
+      this.gm.getBirdSpeed(this.gm.currentLevel),
+      goRight)
+    this.birds.push(bird)
   }
 
   // ── 명중 이펙트 ──────────────────────────────
