@@ -56,6 +56,7 @@ export class GameScene extends Phaser.Scene {
 
   // 스폰
   private birdSpawnTimer    = 0
+  private levelComplete      = false
 
   constructor() { super({ key: 'GameScene' }) }
 
@@ -69,7 +70,7 @@ export class GameScene extends Phaser.Scene {
     this.gm = GameManager.getInstance()
     this.birds = []; this.projectiles = []
     this.wasDown = false; this.isDragging = false
-    this.dragPower = 0; this.birdSpawnTimer = 0
+    this.dragPower = 0; this.birdSpawnTimer = 0; this.levelComplete = false
 
     const { width, height } = this.scale
 
@@ -217,6 +218,47 @@ export class GameScene extends Phaser.Scene {
     })
   }
 
+  // ── 레벨 클리어 연출 ──────────────────────────
+  private showLevelClearEffect(onComplete: () => void) {
+    const { width, height } = this.scale
+
+    const flash = this.add.rectangle(width/2, height/2, width, height, 0xFFD700, 0).setDepth(50)
+    this.tweens.add({
+      targets: flash, alpha: 0.5, duration: 200, yoyo: true, ease: 'Power2',
+      onComplete: () => flash.destroy(),
+    })
+
+    const txt = this.add.text(width/2, height/2, '🎉 CLEAR!', {
+      fontSize: '52px', fontStyle: 'bold', color: '#FFD700',
+      stroke: '#7A4800', strokeThickness: 6,
+    }).setOrigin(0.5).setDepth(51).setScale(0.3).setAlpha(0)
+
+    this.tweens.add({
+      targets: txt, scale: 1.1, alpha: 1, duration: 350, ease: 'Back.easeOut',
+      onComplete: () => {
+        this.tweens.add({
+          targets: txt, scale: 1.3, alpha: 0, duration: 300, delay: 400, ease: 'Power2',
+          onComplete: () => { txt.destroy(); onComplete() },
+        })
+      },
+    })
+
+    const emojis = ['⭐','✨','🌟','💫']
+    for (let i = 0; i < 8; i++) {
+      const ex = width  * (0.1 + Math.random() * 0.8)
+      const ey = height * (0.2 + Math.random() * 0.5)
+      const star = this.add.text(ex, ey, emojis[i % emojis.length], {
+        fontSize: '28px'
+      }).setOrigin(0.5).setDepth(51).setAlpha(0)
+      this.tweens.add({
+        targets: star, alpha: 1, y: ey - 60, duration: 500, delay: i * 80, ease: 'Power1',
+        onComplete: () => {
+          this.tweens.add({ targets: star, alpha: 0, duration: 300, onComplete: () => star.destroy() })
+        },
+      })
+    }
+  }
+
   // ── 업데이트 ─────────────────────────────────
   update(_t: number, delta: number) {
     const ptr    = this.input.activePointer
@@ -283,7 +325,7 @@ export class GameScene extends Phaser.Scene {
     this.wasDown = isDown
 
     // 새 스폰 (화면에 한 마리만)
-    if (this.birds.length === 0) {
+    if (!this.levelComplete && this.birds.length === 0) {
       this.birdSpawnTimer += delta
       const interval = this.gm.currentLevel === 1
         ? 5000
@@ -322,12 +364,24 @@ export class GameScene extends Phaser.Scene {
         if (Phaser.Math.Distance.Between(proj.x, proj.y, bird.x, bird.y) < bird.hitRadius) {
           this.spawnHitEffect(bird.x, bird.y)
           proj.destroy(); this.projectiles.splice(i, 1)
-          bird.playHitAnimation(() => {})
           this.birds.splice(j, 1)
           const result = this.gm.onHit()
           this.hud.update(this.gm.currentLevel, this.gm.currentHits,
             this.gm.getTargetHits(this.gm.currentLevel), this.gm.currentMisses)
-          if (result === 'levelup') { this.gm.levelUp(); this.scene.start('LevelUpScene'); return }
+          if (result === 'levelup') {
+            this.levelComplete = true
+            // ① 새 낙하 애니메이션 완료 대기
+            bird.playHitAnimation(() => {
+              // ② 성공 이펙트 (0.8초)
+              this.showLevelClearEffect(() => {
+                // ③ 레벨업 씬으로 이동
+                this.gm.levelUp()
+                this.scene.start('LevelUpScene')
+              })
+            })
+          } else {
+            bird.playHitAnimation(() => {})
+          }
           break
         }
       }

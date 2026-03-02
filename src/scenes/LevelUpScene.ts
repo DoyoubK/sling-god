@@ -9,77 +9,136 @@ export class LevelUpScene extends Phaser.Scene {
     const { width, height } = this.scale
     const gm = GameManager.getInstance()
 
-    this.add.rectangle(width / 2, height / 2, width, height, TDS.color.blue)
+    // 배경 (그라디언트 느낌 — 블루 오버레이)
+    this.add.rectangle(width/2, height/2, width, height, 0x0A2A5A)
+    const overlay = this.add.graphics()
+    for (let i = 0; i < 30; i++) {
+      const t = i / 30
+      const alpha = 0.25 * (1 - t)
+      overlay.fillStyle(0x1E6FD4, alpha)
+      overlay.fillRect(0, height * t / 1.5, width, height / 30 + 1)
+    }
 
-    // 별 파티클 효과 (간단한 텍스트)
-    const stars = ['⭐', '✨', '🌟']
+    // 별 파티클 (애니메이션)
+    const emojis = ['⭐', '✨', '🌟', '💫']
     const starPos = [
-      { x: 0.15, y: 0.2 }, { x: 0.85, y: 0.25 },
-      { x: 0.1,  y: 0.55 }, { x: 0.9, y: 0.5  },
-      { x: 0.2,  y: 0.75 }, { x: 0.8, y: 0.72 },
+      [0.08, 0.12], [0.88, 0.15], [0.05, 0.50], [0.92, 0.45],
+      [0.12, 0.80], [0.85, 0.75], [0.50, 0.08], [0.48, 0.90],
     ]
-    starPos.forEach((p, i) => {
-      const star = this.add.text(width * p.x, height * p.y, stars[i % stars.length], {
-        fontSize: '22px'
-      }).setOrigin(0.5).setAlpha(0)
+    starPos.forEach(([px, py], i) => {
+      const star = this.add.text(width * px, height * py,
+        emojis[i % emojis.length], { fontSize: '20px' })
+        .setOrigin(0.5).setAlpha(0)
 
       this.tweens.add({
-        targets: star,
-        alpha: 0.8,
-        duration: 300,
-        delay: i * 80,
-        ease: 'Power1',
+        targets: star, alpha: 0.85, duration: 350, delay: i * 70,
+        ease: 'Power1', yoyo: true, repeat: -1, repeatDelay: 800 + i * 120,
       })
     })
 
-    // 레벨업 텍스트 (애니메이션)
-    const levelUpText = this.add.text(width / 2, height * 0.35, '🎉 레벨 업!', {
-      fontSize: '46px', fontFamily: TDS.font.family,
-      color: TDS.color.css.white, fontStyle: 'bold',
-    }).setOrigin(0.5).setScale(0.5).setAlpha(0)
+    // 🎉 레벨업 텍스트 (펑!)
+    const levelUpTxt = this.add.text(width/2, height * 0.26, '🎉 LEVEL UP!', {
+      fontSize: '42px', fontFamily: TDS.font.family,
+      color: '#FFD700', fontStyle: 'bold',
+      stroke: '#7A4800', strokeThickness: 5,
+    }).setOrigin(0.5).setScale(0.2).setAlpha(0)
 
     this.tweens.add({
-      targets: levelUpText,
-      scaleX: 1, scaleY: 1, alpha: 1,
-      duration: 400,
-      ease: 'Back.easeOut',
+      targets: levelUpTxt, scale: 1, alpha: 1,
+      duration: 450, ease: 'Back.easeOut',
     })
 
-    this.add.text(width / 2, height * 0.47, `Level ${gm.currentLevel}`, {
-      fontSize: '30px', fontFamily: TDS.font.family,
-      color: TDS.color.css.white,
-    }).setOrigin(0.5)
+    // 레벨 번호
+    const levelTxt = this.add.text(width/2, height * 0.40, `Level  ${gm.currentLevel}`, {
+      fontSize: '56px', fontFamily: TDS.font.family,
+      color: '#FFFFFF', fontStyle: 'bold',
+    }).setOrigin(0.5).setAlpha(0)
 
-    this.add.text(width / 2, height * 0.555, `목표: ${gm.getTargetHits(gm.currentLevel)}마리`, {
-      fontSize: '19px', fontFamily: TDS.font.family,
-      color: '#C5DCF9',
-    }).setOrigin(0.5)
-
-    // 속도 안내
-    this.add.text(width / 2, height * 0.625, `새 속도 +${gm.currentLevel > 1 ? 30 : 0}  ↑`, {
-      fontSize: '14px', fontFamily: TDS.font.family,
-      color: '#A3C4F3',
-    }).setOrigin(0.5)
-
-    // 카운트다운
-    let count = 3
-    const countText = this.add.text(width / 2, height * 0.8, `${count}초 후 시작`, {
-      fontSize: '16px', fontFamily: TDS.font.family,
-      color: '#C5DCF9',
-    }).setOrigin(0.5)
-
-    const timer = this.time.addEvent({
-      delay: 1000,
-      repeat: 2,
-      callback: () => {
-        count--
-        if (count > 0) {
-          countText.setText(`${count}초 후 시작`)
-        } else {
-          timer.remove()
-          this.scene.start('GameScene')
-        }
-      }
+    this.tweens.add({
+      targets: levelTxt, alpha: 1, duration: 400, delay: 200, ease: 'Power2',
     })
+
+    // 목표 정보 카드
+    const cardY = height * 0.56
+    const card = this.add.graphics()
+    card.fillStyle(0xFFFFFF, 0.10)
+    card.fillRoundedRect(width * 0.12, cardY - 28, width * 0.76, 82, 14)
+    card.lineStyle(1.5, 0xFFFFFF, 0.25)
+    card.strokeRoundedRect(width * 0.12, cardY - 28, width * 0.76, 82, 14)
+    card.setAlpha(0)
+    this.tweens.add({ targets: card, alpha: 1, duration: 300, delay: 350 })
+
+    this.add.text(width/2, cardY, `목표  ${gm.getTargetHits(gm.currentLevel)}마리 명중`, {
+      fontSize: '20px', fontFamily: TDS.font.family, color: '#C8E0FF',
+    }).setOrigin(0.5).setAlpha(0)
+    .setDepth(1)
+
+    const speedLabel = gm.currentLevel > 1
+      ? `새 속도 +${(gm.currentLevel - 1) * 30}`
+      : '기본 속도'
+    this.add.text(width/2, cardY + 32, `🐦 ${speedLabel}`, {
+      fontSize: '15px', fontFamily: TDS.font.family, color: '#90B8E8',
+    }).setOrigin(0.5).setAlpha(0)
+    .setDepth(1)
+
+    // 카드 안 텍스트 딜레이 처리
+    this.time.delayedCall(350, () => {
+      this.children.list
+        .filter(c => c instanceof Phaser.GameObjects.Text && (c as Phaser.GameObjects.Text).alpha === 0)
+        .forEach(c => {
+          this.tweens.add({ targets: c, alpha: 1, duration: 300 })
+        })
+    })
+
+    // ── 시작 버튼 ──────────────────────────────────────────────
+    const btnY = height * 0.78
+    const btnW = width * 0.60
+    const btnH = 56
+
+    const btn = this.add.graphics()
+    const drawBtn = (hover: boolean) => {
+      btn.clear()
+      // 버튼 그림자
+      btn.fillStyle(0x000000, 0.25)
+      btn.fillRoundedRect(width/2 - btnW/2 + 3, btnY - btnH/2 + 5, btnW, btnH, 28)
+      // 버튼 본체
+      btn.fillStyle(hover ? 0xFFE040 : 0xFFD700)
+      btn.fillRoundedRect(width/2 - btnW/2, btnY - btnH/2, btnW, btnH, 28)
+      // 버튼 상단 하이라이트
+      btn.fillStyle(0xFFFFFF, 0.25)
+      btn.fillRoundedRect(width/2 - btnW/2 + 6, btnY - btnH/2 + 4, btnW - 12, 18, 14)
+    }
+    drawBtn(false)
+
+    const btnTxt = this.add.text(width/2, btnY, '▶  시작하기', {
+      fontSize: '22px', fontFamily: TDS.font.family,
+      color: '#7A4800', fontStyle: 'bold',
+    }).setOrigin(0.5).setDepth(1)
+
+    // 버튼 히트 영역
+    const hitArea = this.add.zone(width/2, btnY, btnW, btnH)
+      .setInteractive({ useHandCursor: true })
+
+    hitArea.on('pointerover',  () => { drawBtn(true);  btnTxt.setScale(1.04) })
+    hitArea.on('pointerout',   () => { drawBtn(false); btnTxt.setScale(1.0)  })
+    hitArea.on('pointerdown',  () => {
+      this.tweens.add({
+        targets: [btn, btnTxt], scaleX: 0.95, scaleY: 0.95,
+        duration: 80, yoyo: true, ease: 'Power1',
+        onComplete: () => this.scene.start('GameScene'),
+      })
+    })
+
+    // 버튼 등장 애니메이션
+    btn.setAlpha(0); btnTxt.setAlpha(0)
+    this.tweens.add({ targets: [btn, btnTxt], alpha: 1, duration: 400, delay: 500 })
+
+    // 버튼 살짝 위아래 부유 효과
+    this.tweens.add({
+      targets: [btn, btnTxt], y: `+=6`,
+      duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: 600,
+    })
+
+    this.cameras.main.fadeIn(300, 10, 42, 90)
   }
 }
