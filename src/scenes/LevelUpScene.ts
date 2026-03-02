@@ -68,8 +68,8 @@ export class LevelUpScene extends Phaser.Scene {
     card.setAlpha(0)
     this.tweens.add({ targets: card, alpha: 1, duration: 300, delay: 350 })
 
-    this.add.text(width/2, cardY, `목표  ${gm.getTargetHits(gm.currentLevel)}마리 명중`, {
-      fontSize: '20px', fontFamily: TDS.font.family, color: '#C8E0FF',
+    this.add.text(width/2, cardY, `목표 : ${gm.getTargetHits(gm.currentLevel)}마리 명중`, {
+      fontSize: '26px', fontFamily: TDS.font.family, color: '#FFFFFF', fontStyle: 'bold',
     }).setOrigin(0.5).setAlpha(0)
     .setDepth(1)
 

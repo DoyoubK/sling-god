@@ -37,7 +37,7 @@ export class HUD {
     this.missIcons.forEach(i => i.destroy())
     this.missIcons = []
     for (let i = 0; i < GameManager.MAX_MISSES; i++) {
-      const x = width - 22 - i * 28
+      const x = width - 28 - i * 24
       const y = 38
       const broken = i < currentMisses
       const g = this.scene.add.graphics().setDepth(11)
@@ -47,7 +47,7 @@ export class HUD {
   }
 
   private drawHeart(g: Phaser.GameObjects.Graphics, cx: number, cy: number, broken: boolean) {
-    const s = 9
+    const s = 18
     if (broken) {
       // 잃은 하트: 회색 테두리만
       g.lineStyle(1.5, 0xAAAAAA, 0.6)

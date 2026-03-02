@@ -111,11 +111,7 @@ function drawDistantMountains(scene: Phaser.Scene, w: number, groundY: number) {
   g.fillTriangle(w*0.42, groundY, w*0.62, groundY*0.55, w*0.82, groundY)
   g.fillTriangle(w*0.75, groundY, w*0.91, groundY*0.58, w*1.05, groundY)
 
-  // 산 위 눈 (흰 하이라이트)
-  g.fillStyle(0xEEF5FF, 0.35)
-  g.fillTriangle(w*0.22, groundY*0.52, w*0.25, groundY*0.46, w*0.28, groundY*0.52)
-  g.fillTriangle(w*0.55, groundY*0.46, w*0.58, groundY*0.40, w*0.61, groundY*0.46)
-  g.fillTriangle(w*0.82, groundY*0.50, w*0.85, groundY*0.44, w*0.88, groundY*0.50)
+
 }
 
 // ── 구름 (그림자 레이어 포함, 유기적 형태) ───────────────────────────────

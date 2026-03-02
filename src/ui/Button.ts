@@ -33,9 +33,7 @@ export function createButton(options: ButtonOptions): Phaser.GameObjects.Contain
     // 본체
     g.fillStyle(color)
     g.fillRoundedRect(-width/2, -height/2, width, height, radius)
-    // 상단 하이라이트
-    g.fillStyle(0xFFFFFF, 0.18)
-    g.fillRoundedRect(-width/2 + 6, -height/2 + 4, width - 12, height * 0.38, radius)
+
   }
 
   const bg = scene.add.graphics()
