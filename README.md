@@ -114,3 +114,20 @@ MIT
 ---
 
 > 앱인토스 출시를 위해 게임물관리위원회 등급 심의가 필요합니다.
+
+## 🌿 브랜치 전략
+
+```
+master          ← 항상 최신 안정 버전
+└── feature/*   ← 기능 단위 개발 브랜치
+```
+
+**작업 흐름:**
+```bash
+git checkout master
+git pull origin master
+git checkout -b feature/기능명
+# ... 작업 ...
+git push origin feature/기능명
+# GitHub에서 PR 생성 → master로 머지
+```
