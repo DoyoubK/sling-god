@@ -4,15 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "dev": "granite dev",
+    "build": "granite build",
+    "preview": "vite preview",
+    "deploy": "ait deploy"
   },
   "devDependencies": {
     "typescript": "~5.9.3",
     "vite": "^7.3.1"
   },
   "dependencies": {
+    "@apps-in-toss/web-framework": "^1.14.1",
     "phaser": "^3.90.0"
   }
 }
