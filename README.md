@@ -75,34 +75,41 @@ npm run preview
 
 ## 📁 프로젝트 구조
 
-\`\`\`
-src/
-├── scenes/
-│   ├── GameScene.ts        # 메인 게임 씬
-│   ├── MainMenuScene.ts    # 메인 메뉴
-│   ├── GameOverScene.ts    # 게임 오버
-│   └── LevelUpScene.ts     # 레벨 업
-├── objects/
-│   ├── Bird.ts             # 새 오브젝트 (종류별 설정 포함)
-│   └── Projectile.ts       # 투사체 물리
-├── ui/
-│   ├── HUD.ts              # 상단 HUD (레벨/점수/하트)
-│   ├── GaugeBar.ts         # 발사 파워 게이지
-│   ├── Button.ts           # 공통 버튼
-│   └── SceneBackground.ts  # 배경 렌더러
-├── utils/
-│   └── GameManager.ts      # 전역 게임 상태 관리
-└── constants/
-    └── TDS.ts              # 토스 디자인 시스템 상수
-public/
-└── assets/                 # 이미지 에셋
-    ├── bird_sparrow.png
-    ├── bird_pigeon.png
-    ├── bird_parrot.png
-    ├── bird_owl.png
-    ├── bird_eagle.png
-    └── birdgun.png
-\`\`\`
+```
+sling-god/
+├── public/
+│   └── assets/             # 이미지 에셋
+│       ├── bird_sparrow.png
+│       ├── bird_pigeon.png
+│       ├── bird_parrot.png
+│       ├── bird_owl.png
+│       ├── bird_eagle.png
+│       ├── birdgun.png
+│       └── sling_god.png
+├── src/
+│   ├── scenes/
+│   │   ├── MainMenuScene.ts    # 메인 메뉴
+│   │   ├── GameScene.ts        # 메인 게임 씬
+│   │   ├── LevelUpScene.ts     # 레벨 업
+│   │   └── GameOverScene.ts    # 게임 오버
+│   ├── objects/
+│   │   ├── Bird.ts             # 새 오브젝트 (종류 · 패턴 · 속도)
+│   │   └── Projectile.ts       # 투사체 물리
+│   ├── ui/
+│   │   ├── HUD.ts              # 상단 HUD (레벨 / 점수 / 하트)
+│   │   ├── GaugeBar.ts         # 발사 파워 게이지
+│   │   ├── Button.ts           # 공통 버튼 컴포넌트
+│   │   └── SceneBackground.ts  # 배경 렌더러
+│   ├── utils/
+│   │   └── GameManager.ts      # 전역 게임 상태 싱글톤
+│   ├── constants/
+│   │   └── TDS.ts              # 토스 디자인 시스템 상수
+│   └── main.ts                 # 앱 진입점
+├── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config (Vite 내장)
+```
 
 ## 🗺️ 로드맵
 
@@ -116,7 +123,7 @@ public/
 
 ## 📄 라이선스
 
-MIT
+[MIT](./LICENSE) © 2026 DoyoubK
 
 ---
 
