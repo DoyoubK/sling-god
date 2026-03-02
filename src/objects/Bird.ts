@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 
-export type BirdPattern = 'straight' | 'zigzag' | 'dive' | 'accelerate'
+export type BirdPattern = 'straight' | 'zigzag' | 'dive'
 export type BirdType = 'sparrow' | 'pigeon' | 'parrot' | 'owl' | 'eagle'
 
 interface BirdConfig {
@@ -45,16 +45,15 @@ export class Bird extends Phaser.GameObjects.Container {
     this.cfg      = BIRD_CONFIGS[this.birdType]
     this.hitRadius = this.cfg.hitRadius
 
-    const patterns: BirdPattern[] = ['straight', 'zigzag', 'dive', 'accelerate']
+    const patterns: BirdPattern[] = ['straight', 'straight', 'zigzag', 'dive']
     this.pattern = patterns[Phaser.Math.Between(0, patterns.length - 1)]
 
     const dir = goRight ? 1 : -1
     const s   = speed * this.cfg.speedMult
     switch (this.pattern) {
-      case 'straight':   this.vx = dir * s;       this.vy = 0; break
-      case 'zigzag':     this.vx = dir * s * 0.8; this.vy = 0; break
-      case 'dive':       this.vx = dir * s * 0.9; this.vy = s * 0.3; break
-      case 'accelerate': this.vx = dir * s * 0.6; this.vy = 0; break
+      case 'straight': this.vx = dir * s;       this.vy = 0; break
+      case 'zigzag':   this.vx = dir * s * 0.8; this.vy = 0; break
+      case 'dive':     this.vx = dir * s * 0.9; this.vy = s * 0.3; break
     }
 
     // 날아가는 방향으로 머리가 향하도록 (기본 드로잉은 오른쪽 방향)
@@ -406,9 +405,6 @@ export class Bird extends Phaser.GameObjects.Container {
       this.zigzagTimer += dt
       if (this.zigzagTimer > 0.45) { this.zigzagDir *= -1; this.zigzagTimer = 0 }
       this.vy = this.zigzagDir * 90
-    } else if (this.pattern === 'accelerate') {
-      // 초기 방향 유지하며 가속 (vx 부호 보존)
-      this.vx += (this.vx > 0 ? 1 : -1) * 25 * dt
     }
 
     this.x += this.vx * dt
