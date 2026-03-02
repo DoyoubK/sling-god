@@ -93,14 +93,14 @@
   "hotPaths": [
     {
       "path": "src/scenes/GameScene.ts",
-      "accessCount": 10,
-      "lastAccessed": 1772362500656,
+      "accessCount": 14,
+      "lastAccessed": 1772368505870,
       "type": "file"
     },
     {
       "path": "src/objects/Bird.ts",
-      "accessCount": 5,
-      "lastAccessed": 1772362500262,
+      "accessCount": 6,
+      "lastAccessed": 1772368488583,
       "type": "file"
     },
     {
