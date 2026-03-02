@@ -4,7 +4,6 @@ import { GameManager } from '../utils/GameManager'
 import { Bird } from '../objects/Bird'
 import { Projectile } from '../objects/Projectile'
 import { HUD } from '../ui/HUD'
-import { GaugeBar } from '../ui/GaugeBar'
 
 const SLING_BASE_SPEED = 900
 const MAX_DRAG         = 130
@@ -25,7 +24,6 @@ export class GameScene extends Phaser.Scene {
   private birds: Bird[] = []
   private projectiles: Projectile[] = []
   private hud!: HUD
-  private gaugeBar!: GaugeBar
 
   // 새총
   private slingshotImg!: Phaser.GameObjects.Image
@@ -52,19 +50,17 @@ export class GameScene extends Phaser.Scene {
 
   // 그래픽
   private rubberGfx!:     Phaser.GameObjects.Graphics
+  private arcGaugeGfx!:   Phaser.GameObjects.Graphics
   private trajectoryGfx!: Phaser.GameObjects.Graphics
 
   // 스폰
   private birdSpawnTimer    = 0
+  private levelComplete      = false
 
   constructor() { super({ key: 'GameScene' }) }
 
   preload() {
-    if (!this.textures.exists('bird_sparrow')) { this.load.image('bird_sparrow', 'assets/bird_sparrow.png') }
-    if (!this.textures.exists('bird_pigeon'))  { this.load.image('bird_pigeon',  'assets/bird_pigeon.png')  }
-    if (!this.textures.exists('bird_parrot'))  { this.load.image('bird_parrot',  'assets/bird_parrot.png')  }
-    if (!this.textures.exists('bird_owl'))     { this.load.image('bird_owl',     'assets/bird_owl.png')     }
-    if (!this.textures.exists('bird_eagle'))   { this.load.image('bird_eagle',   'assets/bird_eagle.png')   }
+    // 새는 Graphics API로 직접 렌더링 (PNG 불필요)
     if (!this.textures.exists('birdgun'))
       this.load.image('birdgun', 'assets/birdgun.png')
   }
@@ -73,7 +69,7 @@ export class GameScene extends Phaser.Scene {
     this.gm = GameManager.getInstance()
     this.birds = []; this.projectiles = []
     this.wasDown = false; this.isDragging = false
-    this.dragPower = 0; this.birdSpawnTimer = 0
+    this.dragPower = 0; this.birdSpawnTimer = 0; this.levelComplete = false
 
     const { width, height } = this.scale
 
@@ -110,7 +106,7 @@ export class GameScene extends Phaser.Scene {
     this.hud = new HUD(this)
     this.hud.update(this.gm.currentLevel, this.gm.currentHits,
       this.gm.getTargetHits(this.gm.currentLevel), this.gm.currentMisses)
-    this.gaugeBar = new GaugeBar(this)
+    this.arcGaugeGfx = this.add.graphics().setDepth(8)
 
     this.drawRubber()
   }
@@ -169,6 +165,49 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  // ── 새총 위 반원 게이지 ─────────────────────────
+  private drawArcGauge(power: number) {
+    const g = this.arcGaugeGfx
+    g.clear()
+    if (power < 0.03) return
+
+    // 새총 포크 중앙 위쪽에 반원 게이지
+    const cx = (this.lfx + this.rfx) / 2
+    const cy = (this.lfy + this.rfy) / 2 - 10
+    const R  = 38
+
+    // 배경 트랙 (2/3 반원: 210°~330°)
+    g.lineStyle(5, 0x000000, 0.15)
+    g.beginPath()
+    g.arc(cx, cy, R, Phaser.Math.DegToRad(210), Phaser.Math.DegToRad(330), false)
+    g.strokePath()
+
+    // 채워진 게이지 (파워에 따라 색상 변화)
+    const pct    = Math.min(power, 1)
+    const endDeg = 210 + pct * 120
+    const color  = pct < 0.4 ? 0x44CC44
+                 : pct < 0.7 ? 0xFFAA00
+                 :              0xFF3322
+
+    g.lineStyle(5, color, 0.92)
+    g.beginPath()
+    g.arc(cx, cy, R, Phaser.Math.DegToRad(180), Phaser.Math.DegToRad(endDeg), false)
+    g.strokePath()
+
+    // 끝 점 (현재 파워 위치 동그라미)
+    const endRad = Phaser.Math.DegToRad(endDeg)
+    const ex = cx + Math.cos(endRad) * R
+    const ey = cy + Math.sin(endRad) * R
+    g.fillStyle(color, 1)
+    g.fillCircle(ex, ey, 4)
+
+    // 파워 수치 (중앙 텍스트 대신 작은 점)
+    if (pct > 0.1) {
+      g.fillStyle(color, 0.7)
+      g.fillCircle(cx, cy - R - 8, 3)
+    }
+  }
+
   // ── 점선 궤적 ────────────────────────────────
   private drawTrajectory(vx: number, vy: number) {
     const g = this.trajectoryGfx
@@ -176,13 +215,13 @@ export class GameScene extends Phaser.Scene {
     if (!this.isDragging || this.dragPower < 0.05) return
     let px = this.stoneX, py = this.stoneY
     let pvx = vx, pvy = vy
-    const dt = 0.02
+    const dt = 0.029
     const steps = 70
     for (let i = 0; i < steps; i++) {
       pvy += GRAVITY * dt; px += pvx * dt; py += pvy * dt
       if (py > this.scale.height + 50 || px < -50 || px > this.scale.width + 50) break
-      g.fillStyle(0xF8A030, (1 - i / steps) * 0.72)
-      g.fillCircle(px, py, Math.max(1.5, 3.5 - i * 0.04))
+      g.fillStyle(0xFF5500, (1 - i / steps) * 0.90)
+      g.fillCircle(px, py, Math.max(2, 4 - i * 0.04))
     }
   }
 
@@ -197,10 +236,17 @@ export class GameScene extends Phaser.Scene {
 
   // ── 새 스폰 ──────────────────────────────────
   private spawnBird() {
-    this.birds.push(new Bird(this,
-      this.scale.width + 50,
-      Phaser.Math.Between(100, 600),
-      this.gm.getBirdSpeed(this.gm.currentLevel)))
+    const goRight = Math.random() < 0.3   // 30% 확률로 왼→오
+    const x = goRight ? -50 : this.scale.width + 50
+    // 상단 15% 제외, 나무 줄기 위(h*0.50) 이하에서만 비행
+    const minY = Math.floor(this.scale.height * 0.15)
+    const maxY = Math.floor(this.scale.height * 0.50)
+    const bird = new Bird(this, x,
+      Phaser.Math.Between(minY, maxY),
+      this.gm.getBirdSpeed(this.gm.currentLevel),
+      goRight,
+      this.gm.currentLevel)
+    this.birds.push(bird)
   }
 
   // ── 명중 이펙트 ──────────────────────────────
@@ -212,6 +258,47 @@ export class GameScene extends Phaser.Scene {
       targets: [g, txt], alpha: 0, scaleX: 2.2, scaleY: 2.2, duration: 380, ease: 'Power2',
       onComplete: () => { g.destroy(); txt.destroy() },
     })
+  }
+
+  // ── 레벨 클리어 연출 ──────────────────────────
+  private showLevelClearEffect(onComplete: () => void) {
+    const { width, height } = this.scale
+
+    const flash = this.add.rectangle(width/2, height/2, width, height, 0xFFD700, 0).setDepth(50)
+    this.tweens.add({
+      targets: flash, alpha: 0.5, duration: 200, yoyo: true, ease: 'Power2',
+      onComplete: () => flash.destroy(),
+    })
+
+    const txt = this.add.text(width/2, height/2, '🎉 CLEAR!', {
+      fontSize: '52px', fontStyle: 'bold', color: '#FFD700',
+      stroke: '#7A4800', strokeThickness: 6,
+    }).setOrigin(0.5).setDepth(51).setScale(0.3).setAlpha(0)
+
+    this.tweens.add({
+      targets: txt, scale: 1.1, alpha: 1, duration: 350, ease: 'Back.easeOut',
+      onComplete: () => {
+        this.tweens.add({
+          targets: txt, scale: 1.3, alpha: 0, duration: 300, delay: 400, ease: 'Power2',
+          onComplete: () => { txt.destroy(); onComplete() },
+        })
+      },
+    })
+
+    const emojis = ['⭐','✨','🌟','💫']
+    for (let i = 0; i < 8; i++) {
+      const ex = width  * (0.1 + Math.random() * 0.8)
+      const ey = height * (0.2 + Math.random() * 0.5)
+      const star = this.add.text(ex, ey, emojis[i % emojis.length], {
+        fontSize: '28px'
+      }).setOrigin(0.5).setDepth(51).setAlpha(0)
+      this.tweens.add({
+        targets: star, alpha: 1, y: ey - 60, duration: 500, delay: i * 80, ease: 'Power1',
+        onComplete: () => {
+          this.tweens.add({ targets: star, alpha: 0, duration: 300, onComplete: () => star.destroy() })
+        },
+      })
+    }
   }
 
   // ── 업데이트 ─────────────────────────────────
@@ -242,7 +329,7 @@ export class GameScene extends Phaser.Scene {
         this.drawRubber()
         this.drawTrajectory(-nx * this.dragPower * SLING_BASE_SPEED,
                             -ny * this.dragPower * SLING_BASE_SPEED)
-        this.gaugeBar.setPower(this.dragPower * 100)
+        this.drawArcGauge(this.dragPower)
         this.slingshotImg.setAngle(Phaser.Math.Clamp(dx * 0.025, -7, 7))
       }
     }
@@ -273,14 +360,14 @@ export class GameScene extends Phaser.Scene {
       })
       this.isDragging = false; this.dragPower = 0
       this.trajectoryGfx.clear()
-      this.gaugeBar.setPower(0)
+      this.drawArcGauge(0)
       this.slingshotImg.setAngle(0)
     }
 
     this.wasDown = isDown
 
     // 새 스폰 (화면에 한 마리만)
-    if (this.birds.length === 0) {
+    if (!this.levelComplete && this.birds.length === 0) {
       this.birdSpawnTimer += delta
       const interval = this.gm.currentLevel === 1
         ? 5000
@@ -319,12 +406,24 @@ export class GameScene extends Phaser.Scene {
         if (Phaser.Math.Distance.Between(proj.x, proj.y, bird.x, bird.y) < bird.hitRadius) {
           this.spawnHitEffect(bird.x, bird.y)
           proj.destroy(); this.projectiles.splice(i, 1)
-          bird.playHitAnimation(() => {})
           this.birds.splice(j, 1)
           const result = this.gm.onHit()
           this.hud.update(this.gm.currentLevel, this.gm.currentHits,
             this.gm.getTargetHits(this.gm.currentLevel), this.gm.currentMisses)
-          if (result === 'levelup') { this.gm.levelUp(); this.scene.start('LevelUpScene'); return }
+          if (result === 'levelup') {
+            this.levelComplete = true
+            // ① 새 낙하 애니메이션 완료 대기
+            bird.playHitAnimation(() => {
+              // ② 성공 이펙트 (0.8초)
+              this.showLevelClearEffect(() => {
+                // ③ 레벨업 씬으로 이동
+                this.gm.levelUp()
+                this.scene.start('LevelUpScene')
+              })
+            })
+          } else {
+            bird.playHitAnimation(() => {})
+          }
           break
         }
       }
