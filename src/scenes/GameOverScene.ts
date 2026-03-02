@@ -1,5 +1,7 @@
 import Phaser from 'phaser'
 import { GameManager } from '../utils/GameManager'
+import { createButton } from '../ui/Button'
+import { TDS } from '../constants/TDS'
 
 export class GameOverScene extends Phaser.Scene {
   constructor() { super({ key: 'GameOverScene' }) }
@@ -8,37 +10,54 @@ export class GameOverScene extends Phaser.Scene {
     const { width, height } = this.scale
     const gm = GameManager.getInstance()
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0xF9FAFB)
+    this.add.rectangle(width / 2, height / 2, width, height, TDS.color.bg)
 
-    this.add.text(width / 2, height * 0.3, '아쉽네요 😢', {
-      fontSize: '36px', fontFamily: 'sans-serif', color: '#191F28', fontStyle: 'bold'
+    // 상단 구분선
+    this.add.rectangle(width / 2, height * 0.18, width, 2, TDS.color.lightGray)
+
+    this.add.text(width / 2, height * 0.28, '😢', { fontSize: '56px' }).setOrigin(0.5)
+
+    this.add.text(width / 2, height * 0.4, '아쉽네요!', {
+      fontSize: '34px', fontFamily: TDS.font.family,
+      color: TDS.color.css.dark, fontStyle: 'bold',
     }).setOrigin(0.5)
 
-    this.add.text(width / 2, height * 0.42, `Lv.${gm.currentLevel} 도전 실패`, {
-      fontSize: '20px', fontFamily: 'sans-serif', color: '#6B7684'
+    this.add.text(width / 2, height * 0.49, `Lv.${gm.currentLevel} 도전 실패`, {
+      fontSize: '19px', fontFamily: TDS.font.family,
+      color: TDS.color.css.gray,
     }).setOrigin(0.5)
 
-    // 보상형 광고 버튼 (Revive)
-    const reviveBtn = this.add.rectangle(width / 2, height * 0.57, 280, 56, 0x3182F6)
-      .setInteractive({ useHandCursor: true })
-    this.add.text(width / 2, height * 0.57, '📺 광고 보고 이어하기', {
-      fontSize: '17px', fontFamily: 'sans-serif', color: '#FFFFFF', fontStyle: 'bold'
+    // 명중 수 기록
+    this.add.text(width / 2, height * 0.56, `이번 명중: ${gm.currentHits}마리`, {
+      fontSize: '16px', fontFamily: TDS.font.family,
+      color: TDS.color.css.blue, fontStyle: 'bold',
     }).setOrigin(0.5)
-    reviveBtn.on('pointerdown', () => {
-      // TODO: 앱인토스 보상형 광고 SDK 호출
-      gm.resetForRetry()
-      this.scene.start('GameScene')
+
+    // 광고 버튼 (이어하기)
+    createButton({
+      scene: this, x: width / 2, y: height * 0.67,
+      label: '📺  광고 보고 이어하기', variant: 'primary',
+      onClick: () => {
+        // TODO: 앱인토스 보상형 광고 SDK 연동
+        gm.resetForRetry()
+        this.scene.start('GameScene')
+      }
     })
 
     // 재시작 버튼
-    const retryBtn = this.add.rectangle(width / 2, height * 0.68, 280, 56, 0xE5E8EB)
-      .setInteractive({ useHandCursor: true })
-    this.add.text(width / 2, height * 0.68, '처음부터 다시', {
-      fontSize: '17px', fontFamily: 'sans-serif', color: '#191F28'
-    }).setOrigin(0.5)
-    retryBtn.on('pointerdown', () => {
-      gm.fullReset()
-      this.scene.start('MainMenuScene')
+    createButton({
+      scene: this, x: width / 2, y: height * 0.78,
+      label: '처음부터 다시', variant: 'secondary',
+      onClick: () => {
+        gm.fullReset()
+        this.scene.start('MainMenuScene')
+      }
     })
+
+    // 대기 시간 안내
+    this.add.text(width / 2, height * 0.88, '⏳ 또는 15분 후 자동 충전', {
+      fontSize: '13px', fontFamily: TDS.font.family,
+      color: TDS.color.css.gray,
+    }).setOrigin(0.5)
   }
 }

@@ -1,0 +1,30 @@
+export const TDS = {
+  color: {
+    blue:      0x3182F6,
+    dark:      0x191F28,
+    gray:      0x6B7684,
+    lightGray: 0xE5E8EB,
+    bg:        0xF9FAFB,
+    danger:    0xEF4444,
+    success:   0x22C55E,
+    warning:   0xF59E0B,
+    white:     0xFFFFFF,
+    blueHover: 0x1C64D1,
+    css: {
+      blue:      '#3182F6',
+      dark:      '#191F28',
+      gray:      '#6B7684',
+      lightGray: '#E5E8EB',
+      bg:        '#F9FAFB',
+      danger:    '#EF4444',
+      success:   '#22C55E',
+      warning:   '#F59E0B',
+      white:     '#FFFFFF',
+    },
+  },
+  font: { family: 'sans-serif' },
+  rgb: {
+    blue:   { r: 49,  g: 130, b: 246 },
+    danger: { r: 239, g: 68,  b: 68  },
+  },
+} as const
