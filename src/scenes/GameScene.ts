@@ -173,14 +173,13 @@ export class GameScene extends Phaser.Scene {
     if (!this.isDragging || this.dragPower < 0.05) return
     let px = this.stoneX, py = this.stoneY
     let pvx = vx, pvy = vy
-    const dt = 0.05
-    for (let i = 0; i < 28; i++) {
+    const dt = 0.02
+    const steps = 70
+    for (let i = 0; i < steps; i++) {
       pvy += GRAVITY * dt; px += pvx * dt; py += pvy * dt
       if (py > this.scale.height + 50 || px < -50 || px > this.scale.width + 50) break
-      if (i % 2 === 0) {
-        g.fillStyle(0xF8A030, (1 - i / 28) * 0.72)
-        g.fillCircle(px, py, Math.max(2, 4 - i * 0.1))
-      }
+      g.fillStyle(0xF8A030, (1 - i / steps) * 0.72)
+      g.fillCircle(px, py, Math.max(1.5, 3.5 - i * 0.04))
     }
   }
 
