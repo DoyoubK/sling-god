@@ -176,15 +176,15 @@ export class GameScene extends Phaser.Scene {
     const cy = (this.lfy + this.rfy) / 2 - 10
     const R  = 38
 
-    // 배경 트랙 (반원)
+    // 배경 트랙 (2/3 반원: 210°~330°)
     g.lineStyle(5, 0x000000, 0.15)
     g.beginPath()
-    g.arc(cx, cy, R, Phaser.Math.DegToRad(180), Phaser.Math.DegToRad(360), false)
+    g.arc(cx, cy, R, Phaser.Math.DegToRad(210), Phaser.Math.DegToRad(330), false)
     g.strokePath()
 
     // 채워진 게이지 (파워에 따라 색상 변화)
     const pct    = Math.min(power, 1)
-    const endDeg = 180 + pct * 180
+    const endDeg = 210 + pct * 120
     const color  = pct < 0.4 ? 0x44CC44
                  : pct < 0.7 ? 0xFFAA00
                  :              0xFF3322
