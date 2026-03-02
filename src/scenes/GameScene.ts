@@ -201,7 +201,8 @@ export class GameScene extends Phaser.Scene {
     const bird = new Bird(this, x,
       Phaser.Math.Between(minY, maxY),
       this.gm.getBirdSpeed(this.gm.currentLevel),
-      goRight)
+      goRight,
+      this.gm.currentLevel)
     this.birds.push(bird)
   }
 

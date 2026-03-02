@@ -34,13 +34,14 @@ export class Bird extends Phaser.GameObjects.Container {
   readonly hitRadius: number
   isHit = false
 
-  constructor(scene: Phaser.Scene, x: number, y: number, speed: number, goRight = false) {
+  constructor(scene: Phaser.Scene, x: number, y: number, speed: number, goRight = false, level = 1) {
     super(scene, x, y)
     scene.add.existing(this)
 
-    // 빈도: sparrow > pigeon > parrot > owl > eagle
-    const types: BirdType[] = ['sparrow', 'pigeon', 'parrot', 'owl', 'eagle']
-    const weights           = [40, 28, 17, 10, 5]
+    // 레벨별 새 등장 비중
+    // Lv1: 참새만 / Lv2: 비둘기 추가 / Lv3: 앵무 추가 / Lv4: 올빼미 추가 / Lv5+: 독수리 추가
+    const types: BirdType[]  = ['sparrow', 'pigeon', 'parrot', 'owl', 'eagle']
+    const weights = this.getLevelWeights(level)
     this.birdType = this.weightedRandom(types, weights)
     this.cfg      = BIRD_CONFIGS[this.birdType]
     this.hitRadius = this.cfg.hitRadius
@@ -68,6 +69,24 @@ export class Bird extends Phaser.GameObjects.Container {
 
     this.drawBird(0)
     this.setDepth(10)
+  }
+
+  private getLevelWeights(level: number): number[] {
+    // [sparrow, pigeon, parrot, owl, eagle]
+    if (level === 1) return [100,  0,  0,  0,  0]
+    if (level === 2) return [ 75, 25,  0,  0,  0]
+    if (level === 3) return [ 55, 28, 17,  0,  0]
+    if (level === 4) return [ 40, 27, 20, 13,  0]
+    if (level === 5) return [ 30, 25, 22, 15,  8]
+    // Lv6+: 점점 어려워짐
+    const extra = Math.min(level - 5, 5)
+    return [
+      Math.max(20, 30 - extra * 2),
+      Math.max(18, 25 - extra),
+      22 + extra,
+      15 + extra,
+      8  + extra,
+    ]
   }
 
   private weightedRandom<T>(items: T[], weights: number[]): T {
