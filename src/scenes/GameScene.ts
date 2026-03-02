@@ -195,8 +195,10 @@ export class GameScene extends Phaser.Scene {
   private spawnBird() {
     const goRight = Math.random() < 0.3   // 30% 확률로 왼→오
     const x = goRight ? -50 : this.scale.width + 50
+    // 나무 줄기 꼭대기(h*0.78 - ~130px ≈ h*0.57) 위에서만 비행
+    const maxY = Math.floor(this.scale.height * 0.50)
     const bird = new Bird(this, x,
-      Phaser.Math.Between(100, 600),
+      Phaser.Math.Between(80, maxY),
       this.gm.getBirdSpeed(this.gm.currentLevel),
       goRight)
     this.birds.push(bird)

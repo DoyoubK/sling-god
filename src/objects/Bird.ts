@@ -407,7 +407,8 @@ export class Bird extends Phaser.GameObjects.Container {
       if (this.zigzagTimer > 0.45) { this.zigzagDir *= -1; this.zigzagTimer = 0 }
       this.vy = this.zigzagDir * 90
     } else if (this.pattern === 'accelerate') {
-      this.vx -= 25 * dt
+      // 초기 방향 유지하며 가속 (vx 부호 보존)
+      this.vx += (this.vx > 0 ? 1 : -1) * 25 * dt
     }
 
     this.x += this.vx * dt
