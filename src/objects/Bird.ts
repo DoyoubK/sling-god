@@ -15,11 +15,12 @@ interface BirdConfig {
 }
 
 const BIRD_CONFIGS: Record<BirdType, BirdConfig> = {
-  sparrow: { textureKey: 'bird_sparrow', bodyColor: 0x8B6914, wingColor: 0x6B4C0A, beakColor: 0xF59E0B, eyeColor: 0x191F28, displaySize: 72,  speedMult: 1.2,  hitRadius: 36 },
-  eagle:   { textureKey: null,           bodyColor: 0x4A3728, wingColor: 0x6B4C3B, beakColor: 0xF59E0B, eyeColor: 0xEF4444, displaySize: 90,  speedMult: 0.85, hitRadius: 45 },
-  pigeon:  { textureKey: 'bird_pigeon',  bodyColor: 0x9CA3AF, wingColor: 0xE5E8EB, beakColor: 0xF59E0B, eyeColor: 0x191F28, displaySize: 78,  speedMult: 1.0,  hitRadius: 39 },
-  parrot:  { textureKey: null,           bodyColor: 0x22C55E, wingColor: 0x16A34A, beakColor: 0xF59E0B, eyeColor: 0xEF4444, displaySize: 70,  speedMult: 1.1,  hitRadius: 35 },
-  owl:     { textureKey: null,           bodyColor: 0x6B4C3B, wingColor: 0x4A3728, beakColor: 0xF59E0B, eyeColor: 0xF59E0B, displaySize: 88,  speedMult: 0.7,  hitRadius: 44 },
+  // 속도: sparrow < pigeon < parrot < owl < eagle
+  sparrow: { textureKey: 'bird_sparrow', bodyColor: 0x8B6914, wingColor: 0x6B4C0A, beakColor: 0xF59E0B, eyeColor: 0x191F28, displaySize: 72,  speedMult: 0.6,  hitRadius: 36 },
+  pigeon:  { textureKey: 'bird_pigeon',  bodyColor: 0x9CA3AF, wingColor: 0xE5E8EB, beakColor: 0xF59E0B, eyeColor: 0x191F28, displaySize: 78,  speedMult: 0.8,  hitRadius: 39 },
+  parrot:  { textureKey: null,           bodyColor: 0x22C55E, wingColor: 0x16A34A, beakColor: 0xF59E0B, eyeColor: 0xEF4444, displaySize: 70,  speedMult: 1.0,  hitRadius: 35 },
+  owl:     { textureKey: null,           bodyColor: 0x6B4C3B, wingColor: 0x4A3728, beakColor: 0xF59E0B, eyeColor: 0xF59E0B, displaySize: 88,  speedMult: 1.3,  hitRadius: 44 },
+  eagle:   { textureKey: null,           bodyColor: 0x4A3728, wingColor: 0x6B4C3B, beakColor: 0xF59E0B, eyeColor: 0xEF4444, displaySize: 90,  speedMult: 1.7,  hitRadius: 45 },
 }
 
 export class Bird extends Phaser.GameObjects.Container {
@@ -40,8 +41,9 @@ export class Bird extends Phaser.GameObjects.Container {
     super(scene, x, y)
     scene.add.existing(this)
 
-    const types: BirdType[]  = ['sparrow', 'eagle', 'pigeon', 'parrot', 'owl']
-    const weights             = [35, 25, 20, 15, 5]
+    // 빈도: sparrow > pigeon > parrot > owl > eagle
+    const types: BirdType[]  = ['sparrow', 'pigeon', 'parrot', 'owl', 'eagle']
+    const weights             = [40, 28, 17, 10, 5]
     this.birdType = this.weightedRandom(types, weights)
     this.cfg      = BIRD_CONFIGS[this.birdType]
     this.hitRadius = this.cfg.hitRadius
