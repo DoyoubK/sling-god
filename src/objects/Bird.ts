@@ -67,7 +67,7 @@ export class Bird extends Phaser.GameObjects.Container {
     this.add([this.wingBotGfx, this.bodyGfx, this.wingTopGfx])
 
     this.drawBird(0)
-    this.setDepth(4)
+    this.setDepth(10)
   }
 
   private weightedRandom<T>(items: T[], weights: number[]): T {
@@ -431,7 +431,7 @@ export class Bird extends Phaser.GameObjects.Container {
     xg.beginPath(); xg.moveTo(-er, -er); xg.lineTo(er, er); xg.strokePath()
     xg.beginPath(); xg.moveTo(er, -er);  xg.lineTo(-er, er); xg.strokePath()
     this.add(xg)
-    this.setDepth(15)
+    this.setDepth(20)
 
     this.scene.tweens.add({
       targets: this,
