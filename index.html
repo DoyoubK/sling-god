@@ -4,8 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>새총의 신</title>
+
+  <!-- Pretendard (Toss 기본 폰트) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+    crossorigin="anonymous"
+  />
+
   <style>
+    /* ── TDS CSS Variables ─────────────────────────────── */
+    :root {
+      --tds-blue:       #3182F6;
+      --tds-blue-hover: #1C64D1;
+      --tds-dark:       #191F28;
+      --tds-gray:       #6B7684;
+      --tds-light-gray: #E5E8EB;
+      --tds-bg:         #F9FAFB;
+      --tds-danger:     #EF4444;
+      --tds-success:    #22C55E;
+      --tds-warning:    #F59E0B;
+      --tds-white:      #FFFFFF;
+      --tds-font:       'Pretendard', system-ui, -apple-system, sans-serif;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       background: #191F28;
       display: flex;
@@ -13,15 +38,54 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
+      font-family: var(--tds-font);
+    }
+
+    /* Phaser canvas wrapper */
+    #game-container {
+      position: relative;
     }
     #game-container canvas {
       display: block;
       touch-action: none;
     }
+
+    /* HTML overlay layer — sits on top of canvas, inside game-container */
+    #ui-layer {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none; /* enabled per-overlay when visible */
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    /* Overlay base styles */
+    #ui-layer > div {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Button reset for overlay buttons */
+    #ui-layer button {
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      cursor: pointer;
+      transition: opacity 0.1s, transform 0.1s;
+    }
+    #ui-layer button:active {
+      opacity: 0.85;
+    }
   </style>
 </head>
 <body>
-  <div id="game-container"></div>
+  <div id="game-container">
+    <!-- #ui-layer is created by HTMLOverlay.ts if missing,
+         but declaring it here ensures correct stacking order -->
+    <div id="ui-layer"></div>
+  </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

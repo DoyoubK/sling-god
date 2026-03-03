@@ -1,9 +1,9 @@
 import Phaser from 'phaser'
 import { drawBackground } from '../ui/SceneBackground'
 import { GameManager } from '../utils/GameManager'
-import { createButton } from '../ui/Button'
 import { TDS } from '../constants/TDS'
 import { Bird } from '../objects/Bird'
+import { MainMenuOverlay } from '../ui/overlays/MainMenuOverlay'
 
 export class MainMenuScene extends Phaser.Scene {
   // 날아다니는 새 상태
@@ -11,12 +11,12 @@ export class MainMenuScene extends Phaser.Scene {
   private tweetTimer = 0; private showTweet = false
   private bubbleGfx!: Phaser.GameObjects.Graphics
   private tweetTxt!:  Phaser.GameObjects.Text
+  private overlay!: MainMenuOverlay
 
   constructor() { super({ key: 'MainMenuScene' }) }
 
   preload() {
     if (!this.textures.exists('saechong'))  this.load.image('saechong',  'assets/saechong.png')
-    // 새는 Graphics API로 직접 렌더링
   }
 
   create() {
@@ -24,12 +24,21 @@ export class MainMenuScene extends Phaser.Scene {
 
     drawBackground(this)
     this.drawSlingshot(width, height)
-    this.drawTitleCard(width, height)
     this.initFlyBird(width, height)
 
     this.cameras.main.fadeIn(450, 74, 150, 204)
+
+    // Show HTML overlay (replaces Phaser title card + button)
+    this.overlay = new MainMenuOverlay(() => {
+      GameManager.getInstance().fullReset()
+      this.scene.start('GameScene')
+    })
+    this.overlay.show()
   }
 
+  shutdown() {
+    if (this.overlay) this.overlay.destroy()
+  }
 
   private drawSlingshot(w: number, h: number) {
     if (!this.textures.exists('saechong')) return
@@ -51,55 +60,6 @@ export class MainMenuScene extends Phaser.Scene {
       targets: img, angle: -2, duration: 2200,
       yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     })
-  }
-
-  // ── 타이틀 카드 ──────────────────────────────
-  private drawTitleCard(w: number, h: number) {
-    const cy = h * 0.16
-
-    const card = this.add.graphics().setDepth(5)
-    card.fillStyle(0x1A2A3A, 0.85)
-    card.fillRoundedRect(w/2-155, cy-40, 310, 90, 16)
-    card.lineStyle(2.5, 0xFFFFFF, 0.85)
-    card.strokeRoundedRect(w/2-155, cy-40, 310, 90, 16)
-    // 코너 금색 점
-    const corners:{x:number,y:number}[] = [{x:w/2-155,y:cy-40},{x:w/2+155,y:cy-40},{x:w/2-155,y:cy+50},{x:w/2+155,y:cy+50}]
-    corners.forEach(c2 => { card.fillStyle(0xF8D848); card.fillCircle(c2.x, c2.y, 4) })
-
-    // 타이틀 텍스트 (그림자)
-    this.add.text(w/2+2, cy-8, '새총의 신', {
-      fontSize: '42px', fontFamily: TDS.font.family, color: '#000000', fontStyle: 'bold',
-    }).setOrigin(0.5).setDepth(6).setAlpha(0.35)
-    this.add.text(w/2, cy-10, '새총의 신', {
-      fontSize: '42px', fontFamily: TDS.font.family, color: '#FFFFFF', fontStyle: 'bold',
-    }).setOrigin(0.5).setDepth(7)
-    this.add.text(w/2, cy+30, '날아가는 새를 맞혀라!', {
-      fontSize: '14px', fontFamily: TDS.font.family, color: '#A8D4F0',
-    }).setOrigin(0.5).setDepth(7)
-
-    // 최고 기록
-    const gm = GameManager.getInstance()
-    if (gm.bestLevel > 1) {
-      const bg2 = this.add.graphics().setDepth(5)
-      bg2.fillStyle(0xF8A030, 0.92)
-      bg2.fillRoundedRect(w/2-82, h*0.315, 164, 30, 8)
-      this.add.text(w/2, h*0.330, `★  최고 기록  Lv.${gm.bestLevel}`, {
-        fontSize: '14px', fontFamily: TDS.font.family, color: '#FFFFFF', fontStyle: 'bold',
-      }).setOrigin(0.5).setDepth(6)
-    }
-
-    // 게임 시작 버튼
-    const btnY = h * 0.885
-    const btn  = createButton({
-      scene: this, x: w/2, y: btnY, width: 270, height: 56,
-      label: '▶  게임 시작', variant: 'primary',
-      onClick: () => { GameManager.getInstance().fullReset(); this.scene.start('GameScene') },
-    }).setDepth(8)
-    this.tweens.add({ targets: btn, scaleX: 1.04, scaleY: 1.04, duration: 850, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
-
-    this.add.text(w/2, h*0.958, '드래그로 조준  ✦  손 떼면 발사', {
-      fontSize: '12px', fontFamily: TDS.font.family, color: '#7CB3E0',
-    }).setOrigin(0.5).setDepth(6)
   }
 
   // ── 날아다니는 새 초기화 (데코용 Bird 2마리) ──────────────────
