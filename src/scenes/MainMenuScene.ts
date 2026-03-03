@@ -7,7 +7,6 @@ import { Bird } from '../objects/Bird'
 import { MainMenuOverlay } from '../ui/overlays/MainMenuOverlay'
 
 export class MainMenuScene extends Phaser.Scene {
-  // 날아다니는 새 상태
   private menuBirds: Bird[] = []
   private tweetTimer = 0; private showTweet = false
   private bubbleGfx!: Phaser.GameObjects.Graphics
@@ -17,7 +16,15 @@ export class MainMenuScene extends Phaser.Scene {
   constructor() { super({ key: 'MainMenuScene' }) }
 
   preload() {
-    if (!this.textures.exists('saechong'))  this.load.image('saechong',  'assets/saechong.png')
+    if (!this.textures.exists('saechong'))
+      this.load.image('saechong', 'assets/saechong.png')
+    // 새 이미지 로드 추가!
+    const birds = ['sparrow', 'pigeon', 'parrot', 'owl', 'eagle']
+    for (const b of birds) {
+      const key = `bird_${b}_new`
+      if (!this.textures.exists(key))
+        this.load.image(key, `assets/${b}_new.png`)
+    }
   }
 
   create() {
@@ -29,7 +36,6 @@ export class MainMenuScene extends Phaser.Scene {
 
     this.cameras.main.fadeIn(450, 74, 150, 204)
 
-    // Show HTML overlay (replaces Phaser title card + button)
     this.overlay = new MainMenuOverlay(() => {
       GameManager.getInstance().fullReset()
       this.scene.start('GameScene')
@@ -43,11 +49,10 @@ export class MainMenuScene extends Phaser.Scene {
 
   private drawSlingshot(w: number, h: number) {
     if (!this.textures.exists('saechong')) return
-    const g   = this.add.graphics().setDepth(3)
-    const sx  = w * 0.5
-    const sy  = h * 0.72
+    const g = this.add.graphics().setDepth(3)
+    const sx = w * 0.5
+    const sy = h * 0.72
 
-    // 땅에 박힌 그림자
     g.fillStyle(0x000000, 0.18)
     g.fillEllipse(sx - w*0.02, sy+4, w*0.14, 10)
 
@@ -56,32 +61,28 @@ export class MainMenuScene extends Phaser.Scene {
       .setOrigin(0.5, 0.93)
       .setDepth(4)
 
-    // 살짝 좌우 흔들기
     this.tweens.add({
       targets: img, angle: -2, duration: 2200,
       yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     })
   }
 
-  // ── 날아다니는 새 초기화 (데코용 Bird 2마리) ──────────────────
   private initFlyBird(w: number, h: number) {
     this.tweetTimer = 0; this.showTweet = false
     this.menuBirds = []
 
-    // 첫 번째: 오른쪽→왼쪽
     const b1 = new Bird(this, w + 60,
       Phaser.Math.Between(50, Math.floor(h * 0.28)), 80, false)
     b1.setDepth(9)
     this.menuBirds.push(b1)
 
-    // 두 번째: 약간 뒤에 왼쪽→오른쪽
     const b2 = new Bird(this, -60,
       Phaser.Math.Between(Math.floor(h * 0.10), Math.floor(h * 0.35)), 65, true)
     b2.setDepth(9)
     this.menuBirds.push(b2)
 
     this.bubbleGfx = this.add.graphics().setDepth(9)
-    this.tweetTxt  = this.add.text(0, 0, '짹!', {
+    this.tweetTxt = this.add.text(0, 0, '짹!', {
       fontSize: '12px', fontFamily: TDS.font.family, color: '#191F28', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(10).setVisible(false)
   }
@@ -91,7 +92,6 @@ export class MainMenuScene extends Phaser.Scene {
     const { width, height } = this.scale
     const dt = delta / 1000
 
-    // 새 업데이트 + 화면 벗어나면 리스폰
     for (let i = this.menuBirds.length - 1; i >= 0; i--) {
       const b = this.menuBirds[i]
       b.update(delta)
@@ -107,7 +107,6 @@ export class MainMenuScene extends Phaser.Scene {
       }
     }
 
-    // 짹짹 말풍선 (첫 번째 새 기준)
     this.bubbleGfx.clear()
     this.tweetTimer += dt
     if (this.tweetTimer > 2.8 && !this.showTweet) {

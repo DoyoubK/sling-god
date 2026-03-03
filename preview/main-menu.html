@@ -2,37 +2,39 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=390, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>새총의 신 — 메인 메뉴</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { width:390px; height:844px; overflow:hidden; font-family:'Pretendard',system-ui,sans-serif; background:linear-gradient(180deg,#87CEEB 0%,#B8E4F5 40%,#D4EED4 70%,#8BC34A 100%); position:relative; display:flex; flex-direction:column; align-items:center; }
+html, body { width:100%; height:100%; background:#333; display:flex; justify-content:center; align-items:center; }
+.phone-frame { width:390px; height:844px; overflow:hidden; font-family:'Pretendard',system-ui,sans-serif; background:linear-gradient(180deg,#87CEEB 0%,#B8E4F5 40%,#D4EED4 70%,#8BC34A 100%); position:relative; display:flex; flex-direction:column; align-items:center; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.4); }
 .sun { position:absolute; top:50px; right:60px; width:50px; height:50px; background:#F8D848; border-radius:50%; box-shadow:0 0 20px rgba(248,216,72,0.6); }
 .cloud { position:absolute; background:#fff; border-radius:50px; opacity:0.85; }
 .c1{width:90px;height:28px;top:60px;left:30px;} .c2{width:60px;height:20px;top:52px;left:60px;}
 .c3{width:110px;height:30px;top:100px;right:40px;} .c4{width:70px;height:22px;top:92px;right:60px;}
-.trees { position:absolute; bottom:0; width:100%; display:flex; justify-content:space-around; align-items:flex-end; }
+.trees { position:absolute; bottom:0; width:100%; display:flex; justify-content:space-around; align-items:flex-end; padding:0 20px; }
 .tree { display:flex; flex-direction:column; align-items:center; }
 .tree-top { background:#4CAF50; border-radius:50% 50% 40% 40%; }
 .tree-trunk { background:#795548; }
 .t1 .tree-top{width:55px;height:65px;} .t1 .tree-trunk{width:12px;height:30px;}
 .t2 .tree-top{width:45px;height:55px;background:#388E3C;} .t2 .tree-trunk{width:10px;height:25px;}
 .t3 .tree-top{width:60px;height:70px;} .t3 .tree-trunk{width:13px;height:32px;}
-.slingshot-area { position:absolute; bottom:80px; left:50%; transform:translateX(-50%); font-size:80px; }
+.slingshot-area { position:absolute; bottom:120px; left:50%; transform:translateX(-50%); font-size:80px; }
 .spacer { flex:1; }
-.title-card { background:rgba(26,42,58,0.88); border:2.5px solid rgba(255,255,255,0.85); border-radius:16px; padding:22px 36px 18px; text-align:center; position:relative; margin-top:80px; }
+.title-card { background:rgba(26,42,58,0.88); border:2.5px solid rgba(255,255,255,0.85); border-radius:16px; padding:22px 36px 18px; text-align:center; position:relative; margin-top:120px; }
 .corner { position:absolute; width:10px; height:10px; border-radius:50%; background:#F8D848; }
 .tl{top:-5px;left:-5px;} .tr{top:-5px;right:-5px;} .bl{bottom:-5px;left:-5px;} .br{bottom:-5px;right:-5px;}
 .game-title { font-size:42px; font-weight:700; color:#fff; text-shadow:2px 2px 4px rgba(0,0,0,0.5); }
 .game-sub { font-size:14px; color:#A8D4F0; margin-top:8px; }
 .best-badge { background:#F8A030; border-radius:8px; padding:5px 18px; font-size:14px; color:#fff; font-weight:700; margin-top:6px; display:inline-block; }
-.bottom-area { display:flex; flex-direction:column; align-items:center; gap:12px; padding-bottom:40px; width:100%; }
+.bottom-area { display:flex; flex-direction:column; align-items:center; gap:12px; padding-bottom:60px; width:100%; }
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 .start-btn { width:270px; height:56px; background:#3182F6; color:#fff; font-size:18px; font-weight:700; border:none; border-radius:28px; cursor:pointer; box-shadow:0 4px 12px rgba(49,130,246,0.45); animation:pulse 1.7s ease-in-out infinite; }
-.hint { font-size:12px; color:#7CB3E0; }
+.hint { font-size:12px; color:#5A9E70; }
 </style>
 </head>
 <body>
+<div class="phone-frame">
   <div class="sun"></div>
   <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="cloud c4"></div>
   <div class="trees">
@@ -40,7 +42,7 @@ body { width:390px; height:844px; overflow:hidden; font-family:'Pretendard',syst
     <div class="tree t2"><div class="tree-top"></div><div class="tree-trunk"></div></div>
     <div class="tree t3"><div class="tree-top"></div><div class="tree-trunk"></div></div>
   </div>
-  <div class="slingshot-area">🪃</div>
+  <div class="slingshot-area">🏹</div>
   <div class="spacer"></div>
   <div class="title-card">
     <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
@@ -50,8 +52,9 @@ body { width:390px; height:844px; overflow:hidden; font-family:'Pretendard',syst
   </div>
   <div class="spacer"></div>
   <div class="bottom-area">
-    <button class="start-btn">▶&nbsp; 게임 시작</button>
+    <button class="start-btn">▶  게임 시작</button>
     <div class="hint">드래그로 조준  ✦  손 떼면 발사</div>
   </div>
+</div>
 </body>
 </html>
