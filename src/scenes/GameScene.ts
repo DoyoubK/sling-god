@@ -4,6 +4,7 @@ import { GameManager } from '../utils/GameManager'
 import { Bird } from '../objects/Bird'
 import { Projectile } from '../objects/Projectile'
 import { HUD } from '../ui/HUD'
+import { SoundManager } from '../utils/SoundManager'
 
 const SLING_BASE_SPEED = 900
 const MAX_DRAG         = 130
@@ -74,6 +75,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.gm = GameManager.getInstance()
     this.birds = []; this.projectiles = []
+    SoundManager.getInstance().startBgm()
     this.wasDown = false; this.isDragging = false
     this.dragPower = 0; this.birdSpawnTimer = 0; this.levelComplete = false
 
@@ -411,6 +413,7 @@ export class GameScene extends Phaser.Scene {
         const bird = this.birds[j]
         if (Phaser.Math.Distance.Between(proj.x, proj.y, bird.x, bird.y) < bird.hitRadius) {
           this.spawnHitEffect(bird.x, bird.y)
+            SoundManager.getInstance().playHit()
           proj.destroy(); this.projectiles.splice(i, 1)
           this.birds.splice(j, 1)
           const result = this.gm.onHit()

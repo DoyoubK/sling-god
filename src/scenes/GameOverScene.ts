@@ -1,3 +1,4 @@
+import { SoundManager } from '../utils/SoundManager'
 import Phaser from 'phaser'
 import { GameManager } from '../utils/GameManager'
 import { GameOverOverlay } from '../ui/overlays/GameOverOverlay'
@@ -8,6 +9,8 @@ export class GameOverScene extends Phaser.Scene {
   constructor() { super({ key: 'GameOverScene' }) }
 
   create() {
+    SoundManager.getInstance().stopBgm()
+    SoundManager.getInstance().playGameOver()
     const gm = GameManager.getInstance()
 
     // Plain background — overlay covers everything

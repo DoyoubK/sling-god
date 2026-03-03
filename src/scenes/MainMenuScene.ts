@@ -1,3 +1,4 @@
+import { SoundManager } from '../utils/SoundManager'
 import Phaser from 'phaser'
 import { drawBackground } from '../ui/SceneBackground'
 import { GameManager } from '../utils/GameManager'
