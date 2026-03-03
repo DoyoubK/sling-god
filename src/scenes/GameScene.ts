@@ -60,9 +60,15 @@ export class GameScene extends Phaser.Scene {
   constructor() { super({ key: 'GameScene' }) }
 
   preload() {
-    // 새는 Graphics API로 직접 렌더링 (PNG 불필요)
     if (!this.textures.exists('birdgun'))
       this.load.image('birdgun', 'assets/birdgun.png')
+    // 새 이미지 로드
+    const birds = ['sparrow', 'pigeon', 'parrot', 'owl', 'eagle']
+    for (const b of birds) {
+      const key = `bird_${b}_new`
+      if (!this.textures.exists(key))
+        this.load.image(key, `assets/${b}_new.png`)
+    }
   }
 
   create() {
