@@ -1,6 +1,7 @@
 import { SoundManager } from '../utils/SoundManager'
 import Phaser from 'phaser'
 import { drawBackground } from '../ui/SceneBackground'
+import { preloadBackgroundAssets } from '../ui/SceneBackgroundSprite'
 import { GameManager } from '../utils/GameManager'
 import { TDS } from '../constants/TDS'
 import { Bird } from '../objects/Bird'
@@ -16,6 +17,7 @@ export class MainMenuScene extends Phaser.Scene {
   constructor() { super({ key: 'MainMenuScene' }) }
 
   preload() {
+    preloadBackgroundAssets(this)
     if (!this.textures.exists('saechong'))
       this.load.image('saechong', 'assets/saechong.png')
     // 새 이미지 로드 추가!

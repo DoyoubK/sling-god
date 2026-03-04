@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { drawBackground } from '../ui/SceneBackground'
+import { preloadBackgroundAssets } from '../ui/SceneBackgroundSprite'
 import { GameManager } from '../utils/GameManager'
 import { Bird } from '../objects/Bird'
 import { Projectile } from '../objects/Projectile'
@@ -61,6 +62,7 @@ export class GameScene extends Phaser.Scene {
   constructor() { super({ key: 'GameScene' }) }
 
   preload() {
+    preloadBackgroundAssets(this)
     if (!this.textures.exists('birdgun'))
       this.load.image('birdgun', 'assets/birdgun.png')
     // 새 이미지 로드
