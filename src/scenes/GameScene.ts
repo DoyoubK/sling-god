@@ -1,22 +1,25 @@
 import Phaser from 'phaser'
 import { drawBackground } from '../ui/SceneBackground'
+import { preloadBackgroundAssets } from '../ui/SceneBackgroundSprite'
 import { GameManager } from '../utils/GameManager'
 import { Bird } from '../objects/Bird'
 import { Projectile } from '../objects/Projectile'
 import { HUD } from '../ui/HUD'
+import { SoundManager } from '../utils/SoundManager'
 
 const SLING_BASE_SPEED = 900
 const MAX_DRAG         = 130
 const GRAVITY          = 320
 
-// ── birdgun.png (2048x2048) 실측 상수 ──────────────
-const IMG_SIZE     = 2048
-const ORIGIN_X     = 0.649   // 손잡이 수평 중심 (64.9%)
-const ORIGIN_Y     = 0.950   // 손잡이 하단 (95%)
+// ── sling.png (2816x1536) 실측 상수 ──────────────
+const IMG_W    = 2816
+const IMG_H    = 1536
+const ORIGIN_X = 0.50    // 손잡이 수평 중심 (50%)
+const ORIGIN_Y = 0.940   // 손잡이 하단 (94%)
 
 // 갈래 끝 고무줄 연결 지점 (픽셀 좌표)
-const L_FORK = { x: 992,  y: 310 }   // 왼쪽 갈래 내측 상단
-const R_FORK = { x: 1582, y: 310 }   // 오른쪽 갈래 내측 상단
+const L_FORK = { x: 1074, y: 158 }   // 왼쪽 갈래 내측 상단
+const R_FORK = { x: 1655, y: 158 }   // 오른쪽 갈래 내측 상단
 // ──────────────────────────────────────────────────
 
 export class GameScene extends Phaser.Scene {
@@ -60,8 +63,9 @@ export class GameScene extends Phaser.Scene {
   constructor() { super({ key: 'GameScene' }) }
 
   preload() {
-    if (!this.textures.exists('birdgun'))
-      this.load.image('birdgun', 'assets/birdgun.png')
+    preloadBackgroundAssets(this)
+    if (!this.textures.exists('sling'))
+      this.load.image('sling', 'assets/sling.png')
     // 새 이미지 로드
     const birds = ['sparrow', 'pigeon', 'parrot', 'owl', 'eagle']
     for (const b of birds) {
@@ -74,13 +78,14 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.gm = GameManager.getInstance()
     this.birds = []; this.projectiles = []
+    SoundManager.getInstance().startBgm()
     this.wasDown = false; this.isDragging = false
     this.dragPower = 0; this.birdSpawnTimer = 0; this.levelComplete = false
 
     const { width, height } = this.scale
 
     // 새총 배치 기준점 (손잡이 중심이 여기에 앉음)
-    this.slingshotX = width * 0.44   // 이미지 offset 보정 (우측 치우침 보상)
+    this.slingshotX = width * 0.50   // sling.png 중앙 정렬
     this.slingshotY = height - 18
 
     // 배경
@@ -91,10 +96,10 @@ export class GameScene extends Phaser.Scene {
     this.rubberGfx     = this.add.graphics().setDepth(7)
 
     // 새총 이미지
-    const displayW    = width * 0.60
-    this.imgScale     = displayW / IMG_SIZE
+    const displayW    = width * 0.55
+    this.imgScale     = displayW / IMG_W
 
-    this.slingshotImg = this.add.image(this.slingshotX, this.slingshotY, 'birdgun')
+    this.slingshotImg = this.add.image(this.slingshotX, this.slingshotY, 'sling')
       .setScale(this.imgScale)
       .setOrigin(ORIGIN_X, ORIGIN_Y)
       .setDepth(5)
@@ -120,8 +125,8 @@ export class GameScene extends Phaser.Scene {
   // ── 이미지 픽셀 → 화면 좌표 ──────────────────
   private imgPxToScreen(px: number, py: number) {
     return {
-      x: this.slingshotX + (px - IMG_SIZE * ORIGIN_X) * this.imgScale,
-      y: this.slingshotY + (py - IMG_SIZE * ORIGIN_Y) * this.imgScale,
+      x: this.slingshotX + (px - IMG_W * ORIGIN_X) * this.imgScale,
+      y: this.slingshotY + (py - IMG_H * ORIGIN_Y) * this.imgScale,
     }
   }
 
@@ -411,6 +416,7 @@ export class GameScene extends Phaser.Scene {
         const bird = this.birds[j]
         if (Phaser.Math.Distance.Between(proj.x, proj.y, bird.x, bird.y) < bird.hitRadius) {
           this.spawnHitEffect(bird.x, bird.y)
+            SoundManager.getInstance().playHit()
           proj.destroy(); this.projectiles.splice(i, 1)
           this.birds.splice(j, 1)
           const result = this.gm.onHit()

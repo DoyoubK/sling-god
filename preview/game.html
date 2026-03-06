@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>새총의 신 — 게임 화면</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:390px; height:844px; overflow:hidden; font-family:'Pretendard',system-ui,sans-serif; background:linear-gradient(180deg,#87CEEB 0%,#B8E4F5 50%,#8BC34A 80%,#6A9E3A 100%); position:relative; }
+.hud { position:absolute; top:0; left:0; right:0; padding:16px 20px 10px; background:rgba(25,31,40,0.75); display:flex; justify-content:space-between; align-items:center; }
+.hearts { display:flex; gap:6px; }
+.heart { font-size:22px; }
+.heart.empty { opacity:0.25; }
+.score { font-size:22px; font-weight:800; color:#fff; }
+.level-badge { background:#3182F6; border-radius:20px; padding:4px 14px; font-size:13px; color:#fff; font-weight:700; }
+.bird { position:absolute; font-size:36px; animation:fly 3s linear infinite; }
+.b1{top:160px;left:-40px;animation-duration:2.8s;}
+.b2{top:220px;left:60px;animation-duration:3.5s;animation-delay:-1s;}
+@keyframes fly{from{left:-60px}to{left:440px}}
+.slingshot { position:absolute; bottom:110px; left:50%; transform:translateX(-50%); font-size:90px; }
+.projectile { position:absolute; bottom:200px; left:185px; font-size:20px; }
+.trees { position:absolute; bottom:0; width:100%; display:flex; justify-content:space-around; align-items:flex-end; }
+.tree { display:flex; flex-direction:column; align-items:center; }
+.tree-top{background:#4CAF50;border-radius:50% 50% 40% 40%;}
+.tree-trunk{background:#795548;}
+.t1 .tree-top{width:55px;height:65px;} .t1 .tree-trunk{width:12px;height:30px;}
+.t2 .tree-top{width:45px;height:55px;background:#388E3C;} .t2 .tree-trunk{width:10px;height:25px;}
+.t3 .tree-top{width:60px;height:70px;} .t3 .tree-trunk{width:13px;height:32px;}
+.charge-bar { position:absolute; bottom:60px; left:50%; transform:translateX(-50%); width:200px; height:12px; background:rgba(255,255,255,0.3); border-radius:6px; overflow:hidden; }
+.charge-fill { width:60%; height:100%; background:linear-gradient(90deg,#3182F6,#60A5FA); border-radius:6px; }
+.charge-label { position:absolute; bottom:42px; left:50%; transform:translateX(-50%); font-size:11px; color:rgba(255,255,255,0.7); white-space:nowrap; }
+</style>
+</head>
+<body>
+  <div class="hud">
+    <div class="hearts">
+      <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart empty">🖤</span>
+    </div>
+    <div class="score">🎯 12</div>
+    <div class="level-badge">Lv. 2</div>
+  </div>
+  <div class="bird b1">🐦</div>
+  <div class="bird b2">🐧</div>
+  <div class="trees">
+    <div class="tree t1"><div class="tree-top"></div><div class="tree-trunk"></div></div>
+    <div class="tree t2"><div class="tree-top"></div><div class="tree-trunk"></div></div>
+    <div class="tree t3"><div class="tree-top"></div><div class="tree-trunk"></div></div>
+  </div>
+  <div class="slingshot">🪃</div>
+  <div class="projectile">🪨</div>
+  <div class="charge-bar"><div class="charge-fill"></div></div>
+  <div class="charge-label">길게 누르면 충전</div>
+</body>
+</html>

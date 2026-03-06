@@ -16,4 +16,7 @@ export default defineConfig({
     },
   },
   permissions: [],
+  navigationBar: {
+    withBackButton: true,
+  },
 })

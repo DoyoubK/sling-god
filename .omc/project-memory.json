@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1772350050571,
-  "projectRoot": "/Users/doyoubkwon/develop/saeChong-the-god",
+  "lastScanned": 1772536324155,
+  "projectRoot": "/Users/doyoubkwon/develop/sling-god",
   "techStack": {
     "languages": [
       {
@@ -37,9 +37,10 @@
     "lintCommand": null,
     "devCommand": "npm run dev",
     "scripts": {
-      "dev": "vite",
-      "build": "tsc && vite build",
-      "preview": "vite preview"
+      "dev": "granite dev",
+      "build": "granite build",
+      "preview": "vite preview",
+      "deploy": "ait deploy"
     }
   },
   "conventions": {
@@ -59,11 +60,23 @@
   },
   "customNotes": [],
   "directoryMap": {
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 4,
+      "lastAccessed": 1772536324125,
+      "keyFiles": [
+        "sling-god.android.js",
+        "sling-god.android.js.map",
+        "sling-god.ios.js",
+        "sling-god.ios.js.map"
+      ]
+    },
     "public": {
       "path": "public",
       "purpose": "Public files",
       "fileCount": 1,
-      "lastAccessed": 1772350050558,
+      "lastAccessed": 1772536324126,
       "keyFiles": [
         "vite.svg"
       ]
@@ -72,7 +85,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 4,
-      "lastAccessed": 1772350050558,
+      "lastAccessed": 1772536324130,
       "keyFiles": [
         "counter.ts",
         "main.ts",
@@ -80,11 +93,22 @@
         "typescript.svg"
       ]
     },
+    "public/assets": {
+      "path": "public/assets",
+      "purpose": "Static assets",
+      "fileCount": 13,
+      "lastAccessed": 1772536324131,
+      "keyFiles": [
+        "bird_eagle.png",
+        "bird_owl.png",
+        "bird_parrot.png"
+      ]
+    },
     "src/utils": {
       "path": "src/utils",
       "purpose": "Utility functions",
       "fileCount": 1,
-      "lastAccessed": 1772350050562,
+      "lastAccessed": 1772536324132,
       "keyFiles": [
         "GameManager.ts"
       ]
@@ -92,81 +116,69 @@
   },
   "hotPaths": [
     {
-      "path": "src/scenes/GameScene.ts",
-      "accessCount": 14,
-      "lastAccessed": 1772368505870,
-      "type": "file"
-    },
-    {
-      "path": "src/objects/Bird.ts",
-      "accessCount": 6,
-      "lastAccessed": 1772368488583,
+      "path": "src/main.ts",
+      "accessCount": 3,
+      "lastAccessed": 1772536473145,
       "type": "file"
     },
     {
       "path": "src/scenes/MainMenuScene.ts",
       "accessCount": 2,
-      "lastAccessed": 1772350119119,
+      "lastAccessed": 1772536439723,
       "type": "file"
     },
     {
       "path": "src/scenes/GameOverScene.ts",
       "accessCount": 2,
-      "lastAccessed": 1772350125037,
+      "lastAccessed": 1772536444268,
       "type": "file"
     },
     {
-      "path": "src/scenes/LevelUpScene.ts",
+      "path": "index.html",
       "accessCount": 2,
-      "lastAccessed": 1772350128976,
-      "type": "file"
-    },
-    {
-      "path": "TASK.md",
-      "accessCount": 1,
-      "lastAccessed": 1772350054569,
-      "type": "file"
-    },
-    {
-      "path": "src/main.ts",
-      "accessCount": 1,
-      "lastAccessed": 1772350062916,
+      "lastAccessed": 1772536455757,
       "type": "file"
     },
     {
       "path": "src/constants/TDS.ts",
       "accessCount": 1,
-      "lastAccessed": 1772350074952,
-      "type": "file"
-    },
-    {
-      "path": "src/ui/Button.ts",
-      "accessCount": 1,
-      "lastAccessed": 1772350083436,
-      "type": "file"
-    },
-    {
-      "path": "src/ui/HUD.ts",
-      "accessCount": 1,
-      "lastAccessed": 1772350091650,
-      "type": "file"
-    },
-    {
-      "path": "src/ui/GaugeBar.ts",
-      "accessCount": 1,
-      "lastAccessed": 1772350097068,
-      "type": "file"
-    },
-    {
-      "path": "src/objects/Projectile.ts",
-      "accessCount": 1,
-      "lastAccessed": 1772362429211,
+      "lastAccessed": 1772536333110,
       "type": "file"
     },
     {
       "path": "src/utils/GameManager.ts",
       "accessCount": 1,
-      "lastAccessed": 1772362430475,
+      "lastAccessed": 1772536336126,
+      "type": "file"
+    },
+    {
+      "path": "src/ui/Button.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772536336813,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 1,
+      "lastAccessed": 1772536337697,
+      "type": "directory"
+    },
+    {
+      "path": "src/ui/HTMLOverlay.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772536380756,
+      "type": "file"
+    },
+    {
+      "path": "src/ui/overlays/MainMenuOverlay.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772536398821,
+      "type": "file"
+    },
+    {
+      "path": "src/ui/overlays/GameOverOverlay.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772536411159,
       "type": "file"
     }
   ],

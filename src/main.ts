@@ -28,3 +28,10 @@ const config: Phaser.Types.Core.GameConfig = {
 }
 
 new Phaser.Game(config)
+
+// Ensure #ui-layer stays on top of Phaser's canvas in the DOM
+const uiLayer = document.getElementById('ui-layer')
+if (uiLayer) {
+  const container = document.getElementById('game-container')
+  if (container) container.appendChild(uiLayer)
+}

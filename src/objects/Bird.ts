@@ -32,6 +32,7 @@ export class Bird extends Phaser.GameObjects.Container {
   isHit = false
 
   private sprite!: Phaser.GameObjects.Image
+  private baseScale!: number
 
   constructor(scene: Phaser.Scene, x: number, y: number, speed: number, goRight = false, level = 1) {
     super(scene, x, y)
@@ -56,8 +57,8 @@ export class Bird extends Phaser.GameObjects.Container {
 
     // 스프라이트 생성
     this.sprite = scene.add.image(0, 0, this.cfg.textureKey)
-    const scale = this.cfg.displaySize / Math.max(this.sprite.width, this.sprite.height)
-    this.sprite.setScale(scale)
+    this.baseScale = this.cfg.displaySize / Math.max(this.sprite.width, this.sprite.height)
+    this.sprite.setScale(this.baseScale)
 
     // 왼쪽으로 날 때 수평 반전
     if (!goRight) this.sprite.setFlipX(true)
@@ -102,9 +103,20 @@ export class Bird extends Phaser.GameObjects.Container {
     this.x += this.vx * dt
     this.y += this.vy * dt
 
-    // 날갯짓: 위아래 bobbing
+    // 날갯짓: 2프레임 스타일 - sin 기반 scaleY 오실레이션
     this.wingAngle += dt * this.cfg.wingSpeed
-    this.sprite.y = Math.sin(this.wingAngle) * this.cfg.wingAmp * 0.3
+    const sinVal = Math.sin(this.wingAngle)
+
+    // 세로 bobbing
+    this.sprite.y = sinVal * this.cfg.wingAmp * 0.25
+
+    // 날갯짓: 날개 올림(압축) / 날개 내림(팽창) 교대
+    const wingPhase = (sinVal + 1) / 2  // 0 ~ 1
+    const scaleFlap = 1.0 - wingPhase * 0.18  // 0.82 ~ 1.0
+    this.sprite.setScale(this.baseScale, this.baseScale * scaleFlap)
+
+    // 몸통 약간 기울기
+    this.sprite.angle = sinVal * 3
   }
 
   isOutOfBounds(): boolean {
@@ -116,11 +128,36 @@ export class Bird extends Phaser.GameObjects.Container {
     this.isHit = true
     this.vx = 0; this.vy = 0
 
+    // 눈X 표정: 새 크기에 맞게 X 오버레이
+    const eyeOffsetY = -this.cfg.displaySize * 0.15  // 눈 위치 (상단)
+    const xSize = this.cfg.displaySize * 0.22
+
     const xg = this.scene.add.graphics()
-    xg.lineStyle(3, 0xFF2222, 1)
-    const er = 10
-    xg.beginPath(); xg.moveTo(-er, -er); xg.lineTo(er, er); xg.strokePath()
-    xg.beginPath(); xg.moveTo(er, -er);  xg.lineTo(-er, er); xg.strokePath()
+    // 흰색 테두리 (가독성)
+    xg.lineStyle(6, 0xFFFFFF, 0.9)
+    xg.beginPath(); xg.moveTo(-xSize, eyeOffsetY - xSize); xg.lineTo(xSize, eyeOffsetY + xSize); xg.strokePath()
+    xg.beginPath(); xg.moveTo(xSize, eyeOffsetY - xSize); xg.lineTo(-xSize, eyeOffsetY + xSize); xg.strokePath()
+    // 빨간 X
+    xg.lineStyle(4, 0xFF2222, 1)
+    xg.beginPath(); xg.moveTo(-xSize, eyeOffsetY - xSize); xg.lineTo(xSize, eyeOffsetY + xSize); xg.strokePath()
+    xg.beginPath(); xg.moveTo(xSize, eyeOffsetY - xSize); xg.lineTo(-xSize, eyeOffsetY + xSize); xg.strokePath()
+
+    // 별 이펙트 (명중 순간)
+    const starGfx = this.scene.add.graphics()
+    starGfx.fillStyle(0xFFFF00, 1)
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2
+      const r1 = xSize * 1.8, r2 = xSize * 0.9
+      starGfx.fillTriangle(
+        Math.cos(a) * r1, Math.sin(a) * r1,
+        Math.cos(a + Math.PI / 6) * r2, Math.sin(a + Math.PI / 6) * r2,
+        Math.cos(a - Math.PI / 6) * r2, Math.sin(a - Math.PI / 6) * r2,
+      )
+    }
+    starGfx.setPosition(0, eyeOffsetY)
+    starGfx.setDepth(19)
+    this.scene.tweens.add({ targets: starGfx, alpha: 0, scale: 2, duration: 400, onComplete: () => starGfx.destroy() })
+
     this.add(xg)
     this.setDepth(20)
 

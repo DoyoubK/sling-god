@@ -15,6 +15,9 @@
   },
   "dependencies": {
     "@apps-in-toss/web-framework": "^1.14.1",
+    "@toss/tds-colors": "^0.1.0",
+    "@toss/tds-easings": "^0.0.1",
+    "@toss/tds-typography": "^0.0.3",
     "phaser": "^3.90.0"
   }
 }

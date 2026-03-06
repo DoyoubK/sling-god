@@ -15,13 +15,14 @@ export class GameManager {
   }
 
   getTargetHits(level: number): number {
+    // Lv1=6, Lv2=9, 이후 +3씩 증가 (무한 레벨)
     if (level === 1) return 6
-    if (level === 2) return 15
-    return Math.floor(15 + (level - 2) * 9)
+    return 6 + (level - 1) * 3
   }
 
   getBirdSpeed(level: number): number {
-    return 150 + (level - 1) * 30
+    // base 150, +25/lv (무한 레벨)
+    return 150 + (level - 1) * 25
   }
 
   onHit(): 'continue' | 'levelup' {
