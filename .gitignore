@@ -6,3 +6,20 @@ dist/
 .granite
 
 .granite
+
+# IDE / 앱인토스 프로젝트 파일
+*.ait
+.omc/
+
+# 개발용 프리뷰
+preview/
+
+# 구버전 에셋 (교체됨)
+public/assets/bird_sparrow.png
+public/assets/bird_pigeon.png
+public/assets/bird_eagle.png
+public/assets/bird_owl.png
+public/assets/bird_parrot.png
+public/assets/birdgun.png
+public/assets/saechong.png
+public/assets/sling_god.png
