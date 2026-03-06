@@ -68,19 +68,17 @@ export class Bird extends Phaser.GameObjects.Container {
   }
 
   private getLevelWeights(level: number): number[] {
-    if (level === 1) return [100,  0,  0,  0,  0]
-    if (level === 2) return [ 75, 25,  0,  0,  0]
-    if (level === 3) return [ 55, 28, 17,  0,  0]
-    if (level === 4) return [ 40, 27, 20, 13,  0]
-    if (level === 5) return [ 30, 25, 22, 15,  8]
-    const extra = Math.min(level - 5, 5)
-    return [
-      Math.max(20, 30 - extra * 2),
-      Math.max(18, 25 - extra),
-      22 + extra,
-      15 + extra,
-      8  + extra,
-    ]
+    // [sparrow, pigeon, parrot, owl, eagle]
+    if (level === 1)  return [100,  0,  0,  0,  0]
+    if (level === 2)  return [ 80, 20,  0,  0,  0]
+    if (level === 3)  return [ 60, 40,  0,  0,  0]
+    if (level === 4)  return [ 40, 35, 25,  0,  0]
+    if (level === 5)  return [ 30, 30, 40,  0,  0]
+    if (level === 6)  return [ 25, 25, 35, 15,  0]
+    if (level === 7)  return [ 20, 20, 30, 30,  0]
+    if (level === 8)  return [ 15, 15, 25, 30, 15]
+    if (level === 9)  return [ 10, 15, 25, 30, 20]
+    /* level >= 10 */ return [  5, 10, 25, 35, 25]
   }
 
   private weightedRandom<T>(items: T[], weights: number[]): T {
