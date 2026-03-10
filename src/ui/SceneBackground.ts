@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { BG_ASSET_KEYS } from './SceneBackgroundSprite'
 
 /**
  * SceneBackground v2 — 하이퍼캐주얼 상용 수준 배경
@@ -206,13 +207,28 @@ function drawGround(scene: Phaser.Scene, w: number, h: number, groundY: number) 
 
 // ── 배경 나무 (원경, 작고 연한색) ─────────────────────────────────────────
 function drawFarTrees(scene: Phaser.Scene, w: number, groundY: number) {
-  const g = scene.add.graphics().setDepth(5)
   const positions = [
-    { x: w*0.30, s: 0.50 },
-    { x: w*0.48, s: 0.45 },
-    { x: w*0.65, s: 0.52 },
+    { x: w*0.30, s: 0.50, tint: 0x8BBFA0, flip: false },
+    { x: w*0.48, s: 0.43, tint: 0x7EB898, flip: true  },
+    { x: w*0.65, s: 0.52, tint: 0x90C8A8, flip: false },
   ]
-  positions.forEach(({ x, s }) => drawTree(g, x, groundY, s, true))
+  if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
+    positions.forEach(({ x, s, tint, flip }) => {
+      // 나무 높이 기준 displayH 계산 (원본 1536px 높이)
+      const displayH = groundY * s * 0.85
+      const displayW = displayH * (2816 / 1536)
+      scene.add.image(x, groundY, BG_ASSET_KEYS.tree)
+        .setDisplaySize(displayW, displayH)
+        .setOrigin(0.5, 0.91)   // 나무 밑동 91% 기준
+        .setTint(tint)
+        .setFlipX(flip)
+        .setAlpha(0.60)
+        .setDepth(5)
+    })
+  } else {
+    const g = scene.add.graphics().setDepth(5)
+    positions.forEach(({ x, s }) => drawTree(g, x, groundY, s, true))
+  }
 }
 
 // ── 잔디 + 꽃 디테일 ──────────────────────────────────────────────────────
@@ -251,11 +267,31 @@ function drawGrassDetail(scene: Phaser.Scene, w: number, groundY: number) {
 
 // ── 전경 나무 (근경, 크고 상세) ──────────────────────────────────────────
 function drawNearTrees(scene: Phaser.Scene, w: number, groundY: number) {
-  const g = scene.add.graphics().setDepth(7)
-  drawTree(g, w*0.05,  groundY, 1.10, false)
-  drawTree(g, w*0.17,  groundY, 0.78, false)
-  drawTree(g, w*0.88,  groundY, 1.15, false)
-  drawTree(g, w*0.97,  groundY, 0.72, false)
+  const configs = [
+    { x: w*0.05,  s: 1.10, tint: 0xFFFFFF, flip: false, alpha: 1.0 },
+    { x: w*0.17,  s: 0.78, tint: 0xDDF0DD, flip: true,  alpha: 0.92 },
+    { x: w*0.88,  s: 1.15, tint: 0xFFFFFF, flip: true,  alpha: 1.0 },
+    { x: w*0.97,  s: 0.72, tint: 0xDDEEDD, flip: false, alpha: 0.90 },
+  ]
+  if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
+    configs.forEach(({ x, s, tint, flip, alpha }) => {
+      const displayH = groundY * s * 0.85
+      const displayW = displayH * (2816 / 1536)
+      scene.add.image(x, groundY, BG_ASSET_KEYS.tree)
+        .setDisplaySize(displayW, displayH)
+        .setOrigin(0.5, 0.91)
+        .setTint(tint)
+        .setFlipX(flip)
+        .setAlpha(alpha)
+        .setDepth(7)
+    })
+  } else {
+    const g = scene.add.graphics().setDepth(7)
+    drawTree(g, w*0.05,  groundY, 1.10, false)
+    drawTree(g, w*0.17,  groundY, 0.78, false)
+    drawTree(g, w*0.88,  groundY, 1.15, false)
+    drawTree(g, w*0.97,  groundY, 0.72, false)
+  }
 }
 
 // ── 공용 나무 드로잉 ──────────────────────────────────────────────────────

@@ -21,6 +21,7 @@ export const BG_ASSET_KEYS = {
   treePine:   'tree_pine',
   treeBush:   'tree_bush',
   groundGrass:'ground_grass',
+  tree:        'tree',
 } as const
 
 /** preload() 에서 호출 — 에셋 파일 존재 여부 관계없이 안전하게 로드 시도 */
@@ -32,6 +33,7 @@ export function preloadBackgroundAssets(scene: Phaser.Scene) {
     [BG_ASSET_KEYS.treePine,    'tree_pine.png'],
     [BG_ASSET_KEYS.treeBush,    'tree_bush.png'],
     [BG_ASSET_KEYS.groundGrass, 'ground_grass.png'],
+    [BG_ASSET_KEYS.tree,        'tree.png'],
   ]
   assets.forEach(([key, file]) => {
     if (!scene.textures.exists(key)) {

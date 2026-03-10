@@ -26,6 +26,8 @@ export class MainMenuScene extends Phaser.Scene {
       this.load.image('sling_new', 'assets/sling_new.png')
     if (!this.textures.exists('stone'))
       this.load.image('stone', 'assets/stone.png')
+    if (!this.textures.exists('tree'))
+      this.load.image('tree', 'assets/tree.png')
     // 새 이미지 로드 추가!
     const birds = ['sparrow', 'pigeon', 'parrot', 'owl', 'eagle']
     for (const b of birds) {
@@ -39,6 +41,7 @@ export class MainMenuScene extends Phaser.Scene {
     const { width, height } = this.scale
 
     drawBackground(this)
+    this.drawMenuTrees(width, height)
     this.drawSlingshot(width, height)
     this.initFlyBird(width, height)
 
@@ -53,6 +56,37 @@ export class MainMenuScene extends Phaser.Scene {
 
   shutdown() {
     if (this.overlay) this.overlay.destroy()
+  }
+
+  private drawMenuTrees(w: number, h: number) {
+    if (!this.textures.exists('tree')) return
+    const groundY = h * 0.76
+
+    // 원경 나무 (작고 흐리게)
+    const farTrees = [
+      { x: w*0.12, s: 0.42, tint: 0x88B898, flip: false, alpha: 0.55 },
+      { x: w*0.82, s: 0.38, tint: 0x90C0A0, flip: true,  alpha: 0.50 },
+    ]
+    // 전경 나무 (크고 선명하게)
+    const nearTrees = [
+      { x: w*0.02,  s: 0.95, tint: 0xFFFFFF, flip: false, alpha: 1.0  },
+      { x: w*0.98,  s: 1.00, tint: 0xEEF8EE, flip: true,  alpha: 1.0  },
+    ]
+
+    farTrees.forEach(({ x, s, tint, flip, alpha }) => {
+      const dH = groundY * s * 0.85
+      const dW = dH * (2816 / 1536)
+      this.add.image(x, groundY, 'tree')
+        .setDisplaySize(dW, dH).setOrigin(0.5, 0.91)
+        .setTint(tint).setFlipX(flip).setAlpha(alpha).setDepth(5)
+    })
+    nearTrees.forEach(({ x, s, tint, flip, alpha }) => {
+      const dH = groundY * s * 0.85
+      const dW = dH * (2816 / 1536)
+      this.add.image(x, groundY, 'tree')
+        .setDisplaySize(dW, dH).setOrigin(0.5, 0.91)
+        .setTint(tint).setFlipX(flip).setAlpha(alpha).setDepth(7)
+    })
   }
 
   private drawSlingshot(w: number, h: number) {
