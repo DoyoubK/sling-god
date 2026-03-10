@@ -22,6 +22,8 @@ export class MainMenuScene extends Phaser.Scene {
       this.load.image('saechong', 'assets/saechong.png')
     if (!this.textures.exists('sling'))
       this.load.image('sling', 'assets/sling.png')
+    if (!this.textures.exists('sling_new'))
+      this.load.image('sling_new', 'assets/sling_new.png')
     if (!this.textures.exists('stone'))
       this.load.image('stone', 'assets/stone.png')
     // 새 이미지 로드 추가!
@@ -54,71 +56,78 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private drawSlingshot(w: number, h: number) {
-    // ── 상수 (GameScene과 동일) ──────────────────────────────
+    // ── sling_new.png 기준 상수 ──────────────────────────────
     const IMG_W    = 2816
     const IMG_H    = 1536
-    const ORIGIN_X = 0.50
-    const ORIGIN_Y = 0.940
-    const L_FORK   = { x: 1074, y: 158 }
-    const R_FORK   = { x: 1655, y: 158 }
+    // 이미지 분석: 손잡이 하단 x=28%, y=88%
+    const ORIGIN_X = 0.28
+    const ORIGIN_Y = 0.88
+    // 갈래 끝 픽셀 좌표 (이미지 분석 기준)
+    const L_FORK   = { x: Math.round(0.32 * IMG_W), y: Math.round(0.08 * IMG_H) }  // x=901, y=123
+    const R_FORK   = { x: Math.round(0.62 * IMG_W), y: Math.round(0.18 * IMG_H) }  // x=1746, y=276
 
-    // ── 새총 위치: 화면 하단 왼쪽 (쏘기 직전 자세) ──────────
-    const slingshotX = w * 0.42
-    const slingshotY = h * 0.92
+    // ── 새총 위치: 버튼 위로 충분히 높게 ───────────────────
+    const slingshotX = w * 0.46
+    const slingshotY = h * 0.68   // 버튼 위 여유있게
 
     const displayW = w * 0.825
     const imgScale = displayW / IMG_W
 
-    // 그림자
-    const shadow = this.add.graphics().setDepth(3)
-    shadow.fillStyle(0x000000, 0.15)
-    shadow.fillEllipse(slingshotX, slingshotY + 4, w * 0.18, 10)
-
-    // 새총 이미지
-    this.add.image(slingshotX, slingshotY, 'sling')
-      .setScale(imgScale)
-      .setOrigin(ORIGIN_X, ORIGIN_Y)
-      .setDepth(5)
-
-    // ── 갈래 끝 화면 좌표 계산 ──────────────────────────────
+    // 화면좌표 변환 함수
     const toScreen = (px: number, py: number) => ({
       x: slingshotX + (px - IMG_W * ORIGIN_X) * imgScale,
       y: slingshotY + (py - IMG_H * ORIGIN_Y) * imgScale,
     })
+
+    // 갈래 끝 화면 좌표
     const L = toScreen(L_FORK.x, L_FORK.y)
     const R = toScreen(R_FORK.x, R_FORK.y)
 
-    // ── 돌 위치: 왼쪽 아래로 당겨진 상태 ────────────────────
+    // 파우치 기본 위치 (갈래 두 끝점 중간)
     const restX = (L.x + R.x) / 2
-    const restY = (L.y + R.y) / 2 + 24
-    // 당긴 방향: 왼쪽 아래
-    const pullX = restX - w * 0.10
-    const pullY = restY + h * 0.06
+    const restY = (L.y + R.y) / 2 + 20
 
-    // ── 고무줄 ───────────────────────────────────────────────
-    const rubber = this.add.graphics().setDepth(6)
+    // 당겨진 돌 위치: 왼쪽 아래 대각선
+    const pullX = restX - w * 0.13
+    const pullY = restY + h * 0.07
+
+    // ── 그림자 ───────────────────────────────────────────────
+    this.add.graphics().setDepth(3)
+      .fillStyle(0x000000, 0.12)
+      .fillEllipse(slingshotX + w * 0.02, slingshotY + 6, w * 0.18, 10)
+
+    // ── 고무줄 (새총 뒤에: depth 4) ─────────────────────────
+    const rubber = this.add.graphics().setDepth(4)
+    // 외곽선
     rubber.lineStyle(5, 0x1A0A00, 0.9)
     rubber.beginPath(); rubber.moveTo(L.x, L.y); rubber.lineTo(pullX, pullY); rubber.strokePath()
     rubber.beginPath(); rubber.moveTo(R.x, R.y); rubber.lineTo(pullX, pullY); rubber.strokePath()
+    // 내부 색상
     rubber.lineStyle(3, 0x7B3B0A, 0.95)
     rubber.beginPath(); rubber.moveTo(L.x, L.y); rubber.lineTo(pullX, pullY); rubber.strokePath()
     rubber.beginPath(); rubber.moveTo(R.x, R.y); rubber.lineTo(pullX, pullY); rubber.strokePath()
-
     // 파우치
-    rubber.fillStyle(0x2A1200); rubber.fillRect(pullX - 8, pullY - 3,  16, 11)
-    rubber.fillStyle(0x5C2800); rubber.fillRect(pullX - 6, pullY - 1,  12, 8)
+    rubber.fillStyle(0x2A1200); rubber.fillRect(pullX - 9, pullY - 4, 18, 12)
+    rubber.fillStyle(0x5C2800); rubber.fillRect(pullX - 7, pullY - 2, 14, 9)
+    rubber.fillStyle(0x7A3A10); rubber.fillRect(pullX - 5, pullY,     10, 5)
 
-    // ── 돌 이미지 ────────────────────────────────────────────
-    const stoneImg = this.add.image(pullX, pullY - 8, 'stone')
+    // ── 새총 이미지 (depth 5, 고무줄 앞) ────────────────────
+    this.add.image(slingshotX, slingshotY, 'sling_new')
+      .setScale(imgScale)
+      .setOrigin(ORIGIN_X, ORIGIN_Y)
+      .setDepth(5)
+
+    // ── 돌 이미지 (depth 6, 새총 앞) ────────────────────────
+    const stoneImg = this.add.image(pullX, pullY - 10, 'stone')
       .setScale(54 / 1536)
       .setOrigin(0.5, 0.5)
-      .setDepth(7)
+      .setDepth(6)
 
-    // ── 애니메이션: 미세하게 떨리는 효과 ───────────────────
+    // ── 미세 떨림 애니메이션 ─────────────────────────────────
     this.tweens.add({
-      targets: [stoneImg, rubber],
-      x: `+=3`, y: `+=2`,
-      duration: 180, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      targets: stoneImg,
+      x: `+=4`, y: `+=3`,
+      duration: 200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     })
   }
 
