@@ -100,17 +100,22 @@ function drawSunGlow(scene: Phaser.Scene, w: number, h: number) {
 function drawDistantMountains(scene: Phaser.Scene, w: number, groundY: number) {
   const g = scene.add.graphics().setDepth(2)
 
-  // 레이어 1 — 가장 먼 산 (청회색, 반투명)
-  g.fillStyle(0x8AAFC8, 0.45)
-  g.fillTriangle(w*0.0,  groundY, w*0.25, groundY*0.52, w*0.50, groundY)
-  g.fillTriangle(w*0.30, groundY, w*0.55, groundY*0.46, w*0.80, groundY)
-  g.fillTriangle(w*0.60, groundY, w*0.82, groundY*0.50, w*1.05, groundY)
+  // 레이어 1 — 가장 먼 산 (청회색)
+  g.fillStyle(0x8AAFC8, 0.70)
+  g.fillTriangle(w*0.0,  groundY, w*0.25, groundY*0.40, w*0.50, groundY)
+  g.fillTriangle(w*0.30, groundY, w*0.55, groundY*0.34, w*0.80, groundY)
+  g.fillTriangle(w*0.60, groundY, w*0.82, groundY*0.38, w*1.05, groundY)
 
-  // 레이어 2 — 중간 산 (약간 진한 청록)
-  g.fillStyle(0x6A9AB0, 0.55)
-  g.fillTriangle(w*0.05, groundY, w*0.22, groundY*0.60, w*0.40, groundY)
-  g.fillTriangle(w*0.42, groundY, w*0.62, groundY*0.55, w*0.82, groundY)
-  g.fillTriangle(w*0.75, groundY, w*0.91, groundY*0.58, w*1.05, groundY)
+  // 레이어 2 — 중간 산 (청록)
+  g.fillStyle(0x5A8AA0, 0.80)
+  g.fillTriangle(w*0.05, groundY, w*0.22, groundY*0.50, w*0.40, groundY)
+  g.fillTriangle(w*0.42, groundY, w*0.62, groundY*0.45, w*0.82, groundY)
+  g.fillTriangle(w*0.75, groundY, w*0.91, groundY*0.48, w*1.05, groundY)
+
+  // 산 눈덮개 하이라이트
+  g.fillStyle(0xE8F4FF, 0.50)
+  g.fillTriangle(w*0.22, groundY*0.50, w*0.25, groundY*0.40, w*0.28, groundY*0.50)
+  g.fillTriangle(w*0.52, groundY*0.44, w*0.55, groundY*0.34, w*0.58, groundY*0.44)
 
 
 }
@@ -215,7 +220,7 @@ function drawFarTrees(scene: Phaser.Scene, w: number, groundY: number) {
   if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
     positions.forEach(({ x, s, tint, flip }) => {
       // 나무 높이 기준 displayH 계산 (원본 1536px 높이)
-      const displayH = groundY * s * 0.85
+      const displayH = groundY * s * 0.26
       const displayW = displayH * (2816 / 1536)
       scene.add.image(x, groundY, BG_ASSET_KEYS.tree)
         .setDisplaySize(displayW, displayH)
@@ -223,11 +228,11 @@ function drawFarTrees(scene: Phaser.Scene, w: number, groundY: number) {
         .setTint(tint)
         .setFlipX(flip)
         .setAlpha(0.60)
-        .setDepth(5)
+        .setDepth(1)
     })
   } else {
-    const g = scene.add.graphics().setDepth(5)
-    positions.forEach(({ x, s }) => drawTree(g, x, groundY, s, true))
+    const g = scene.add.graphics().setDepth(1)
+    positions.forEach(({ x, s }) => drawTree(g, x, groundY, s * 0.25, true))
   }
 }
 
@@ -275,7 +280,7 @@ function drawNearTrees(scene: Phaser.Scene, w: number, groundY: number) {
   ]
   if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
     configs.forEach(({ x, s, tint, flip, alpha }) => {
-      const displayH = groundY * s * 0.85
+      const displayH = groundY * s * 0.26
       const displayW = displayH * (2816 / 1536)
       scene.add.image(x, groundY, BG_ASSET_KEYS.tree)
         .setDisplaySize(displayW, displayH)
@@ -283,14 +288,14 @@ function drawNearTrees(scene: Phaser.Scene, w: number, groundY: number) {
         .setTint(tint)
         .setFlipX(flip)
         .setAlpha(alpha)
-        .setDepth(7)
+        .setDepth(3)
     })
   } else {
-    const g = scene.add.graphics().setDepth(7)
-    drawTree(g, w*0.05,  groundY, 1.10, false)
-    drawTree(g, w*0.17,  groundY, 0.78, false)
-    drawTree(g, w*0.88,  groundY, 1.15, false)
-    drawTree(g, w*0.97,  groundY, 0.72, false)
+    const g = scene.add.graphics().setDepth(3)
+    drawTree(g, w*0.05,  groundY, 0.28, false)
+    drawTree(g, w*0.17,  groundY, 0.20, false)
+    drawTree(g, w*0.88,  groundY, 0.29, false)
+    drawTree(g, w*0.97,  groundY, 0.18, false)
   }
 }
 

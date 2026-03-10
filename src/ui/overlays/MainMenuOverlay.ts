@@ -58,7 +58,7 @@ export class MainMenuOverlay extends HTMLOverlay {
 
     return `
       <!-- top spacer -->
-      <div style="flex:1"></div>
+      <div style="flex:0 0 24px"></div>
 
       <!-- title card -->
       <div style="
@@ -68,7 +68,7 @@ export class MainMenuOverlay extends HTMLOverlay {
         padding:22px 36px 18px;
         text-align:center;
         position:relative;
-        margin-top:60px;
+        margin-top:0px;
       ">
         <!-- corner dots -->
         <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border-radius:50%;background:#F8D848;"></div>

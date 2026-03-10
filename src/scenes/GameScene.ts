@@ -15,11 +15,11 @@ const GRAVITY          = 320
 const IMG_W    = 2816
 const IMG_H    = 1536
 const ORIGIN_X = 0.50    // 손잡이 수평 중심 (50%)
-const ORIGIN_Y = 0.940   // 손잡이 하단 (94%)
+const ORIGIN_Y = 0.970   // 손잡이 하단 (97%)
 
 // 갈래 끝 고무줄 연결 지점 (픽셀 좌표)
-const L_FORK = { x: 1074, y: 158 }   // 왼쪽 갈래 내측 상단
-const R_FORK = { x: 1655, y: 158 }   // 오른쪽 갈래 내측 상단
+const L_FORK = { x: 1042, y:  77 }   // 왼쪽 갈래 내측 끝 (실측 37%, 5%)
+const R_FORK = { x: 1774, y:  77 }   // 오른쪽 갈래 내측 끝 (실측 63%, 5%)
 // ──────────────────────────────────────────────────
 
 export class GameScene extends Phaser.Scene {
