@@ -101,7 +101,7 @@ export class GameScene extends Phaser.Scene {
     this.rubberGfx     = this.add.graphics().setDepth(7)
 
     // 새총 이미지
-    const displayW    = width * 0.55
+    const displayW    = width * 0.825
     this.imgScale     = displayW / IMG_W
 
     this.slingshotImg = this.add.image(this.slingshotX, this.slingshotY, 'sling')
@@ -126,7 +126,7 @@ export class GameScene extends Phaser.Scene {
 
     // 새총 장전 돌 이미지 (stone.png 원본 1536px 기준 36px 표시)
     this.stoneImg = this.add.image(this.stoneX, this.stoneY - 8, 'stone')
-      .setScale(36 / 1536)
+      .setScale(54 / 1536)
       .setOrigin(0.5, 0.5)
       .setDepth(8)
 

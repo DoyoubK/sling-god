@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 
 // 돌 이미지 원본 크기 기준 표시 직경 (px)
-const STONE_DISPLAY_DIAMETER = 36
+const STONE_DISPLAY_DIAMETER = 54
 const STONE_IMG_SIZE = 1536  // stone.png 높이 기준
 
 export class Projectile extends Phaser.GameObjects.Container {
