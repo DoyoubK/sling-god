@@ -51,6 +51,9 @@ export class GameScene extends Phaser.Scene {
   private isDragging = false
   private dragPower  = 0
 
+  // 새총 장전 돌 이미지
+  private stoneImg!:      Phaser.GameObjects.Image
+
   // 그래픽
   private rubberGfx!:     Phaser.GameObjects.Graphics
   private arcGaugeGfx!:   Phaser.GameObjects.Graphics
@@ -64,6 +67,8 @@ export class GameScene extends Phaser.Scene {
 
   preload() {
     preloadBackgroundAssets(this)
+    if (!this.textures.exists('stone'))
+      this.load.image('stone', 'assets/stone.png')
     if (!this.textures.exists('sling'))
       this.load.image('sling', 'assets/sling.png')
     // 새 이미지 로드
@@ -119,6 +124,12 @@ export class GameScene extends Phaser.Scene {
       this.gm.getTargetHits(this.gm.currentLevel), this.gm.currentMisses)
     this.arcGaugeGfx = this.add.graphics().setDepth(8)
 
+    // 새총 장전 돌 이미지 (stone.png 원본 1536px 기준 36px 표시)
+    this.stoneImg = this.add.image(this.stoneX, this.stoneY - 8, 'stone')
+      .setScale(36 / 1536)
+      .setOrigin(0.5, 0.5)
+      .setDepth(8)
+
     this.drawRubber()
   }
 
@@ -158,12 +169,8 @@ export class GameScene extends Phaser.Scene {
     rb.fillStyle(0x5C2800); rb.fillRect(sx - 6,  sy - 1,  12, 8)
     rb.fillStyle(0x7A3A10); rb.fillRect(sx - 4,  sy,      8,  5)
 
-    // 돌멩이
-    rb.fillStyle(0x4A5058); rb.fillRect(sx - 10, sy - 12, 20, 20)
-    rb.fillStyle(0x6A7480); rb.fillRect(sx - 8,  sy - 10, 16, 16)
-    rb.fillStyle(0x8A9AA4); rb.fillRect(sx - 5,  sy - 8,  10, 10)
-    rb.fillStyle(0xAABAC4); rb.fillRect(sx - 3,  sy - 7,  5,  5)
-    rb.fillStyle(0xCCDCE4); rb.fillRect(sx - 2,  sy - 6,  2,  2)   // 하이라이트
+    // 돌 이미지 위치 업데이트 (파우치 중앙)
+    if (this.stoneImg) this.stoneImg.setPosition(sx, sy - 8)
 
     // 파워 세질수록 불꽃
     if (this.isDragging && this.dragPower > 0.12) {
@@ -238,6 +245,7 @@ export class GameScene extends Phaser.Scene {
 
   // ── 발사 ─────────────────────────────────────
   private fire(vx: number, vy: number) {
+    this.stoneImg.setVisible(false)
     this.projectiles.push(new Projectile(this, this.stoneX, this.stoneY, vx, vy))
     this.tweens.add({
       targets: this.slingshotImg,
@@ -366,6 +374,7 @@ export class GameScene extends Phaser.Scene {
         },
         onComplete: () => {
           this.stoneX = this.stoneRestX; this.stoneY = this.stoneRestY
+          this.stoneImg.setVisible(true)
           this.drawRubber()
         },
       })
