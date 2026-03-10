@@ -74,18 +74,18 @@ export class MainMenuScene extends Phaser.Scene {
     ]
 
     farTrees.forEach(({ x, s, tint, flip, alpha }) => {
-      const dH = groundY * s * 0.85
+      const dH = groundY * s * 0.425   // 절반
       const dW = dH * (2816 / 1536)
       this.add.image(x, groundY, 'tree')
         .setDisplaySize(dW, dH).setOrigin(0.5, 0.91)
-        .setTint(tint).setFlipX(flip).setAlpha(alpha).setDepth(5)
+        .setTint(tint).setFlipX(flip).setAlpha(alpha).setDepth(1)
     })
     nearTrees.forEach(({ x, s, tint, flip, alpha }) => {
-      const dH = groundY * s * 0.85
+      const dH = groundY * s * 0.425   // 절반
       const dW = dH * (2816 / 1536)
       this.add.image(x, groundY, 'tree')
         .setDisplaySize(dW, dH).setOrigin(0.5, 0.91)
-        .setTint(tint).setFlipX(flip).setAlpha(alpha).setDepth(7)
+        .setTint(tint).setFlipX(flip).setAlpha(alpha).setDepth(2)
     })
   }
 
@@ -131,7 +131,7 @@ export class MainMenuScene extends Phaser.Scene {
       .fillEllipse(slingshotX + w * 0.02, slingshotY + 6, w * 0.18, 10)
 
     // ── 고무줄 (새총 뒤에: depth 4) ─────────────────────────
-    const rubber = this.add.graphics().setDepth(4)
+    const rubber = this.add.graphics().setDepth(10)
     // 외곽선
     rubber.lineStyle(5, 0x1A0A00, 0.9)
     rubber.beginPath(); rubber.moveTo(L.x, L.y); rubber.lineTo(pullX, pullY); rubber.strokePath()
@@ -149,13 +149,13 @@ export class MainMenuScene extends Phaser.Scene {
     this.add.image(slingshotX, slingshotY, 'sling_new')
       .setScale(imgScale)
       .setOrigin(ORIGIN_X, ORIGIN_Y)
-      .setDepth(5)
+      .setDepth(11)
 
     // ── 돌 이미지 (depth 6, 새총 앞) ────────────────────────
     const stoneImg = this.add.image(pullX, pullY - 10, 'stone')
       .setScale(54 / 1536)
       .setOrigin(0.5, 0.5)
-      .setDepth(6)
+      .setDepth(12)
 
     // ── 미세 떨림 애니메이션 ─────────────────────────────────
     this.tweens.add({
