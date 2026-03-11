@@ -16,11 +16,13 @@ import Phaser from 'phaser'
  */
 
 export const BG_ASSET_KEYS = {
-  skyHills:   'bg_sky_hills',
-  treeOak:    'tree_oak',
-  treePine:   'tree_pine',
-  treeBush:   'tree_bush',
-  groundGrass:'ground_grass',
+  skyHills:    'bg_sky_hills',
+  ingameMount: 'ingame_mountain',
+  homeMount:   'home_mountain',
+  treeOak:     'tree_oak',
+  treePine:    'tree_pine',
+  treeBush:    'tree_bush',
+  groundGrass: 'ground_grass',
   tree:        'tree',
 } as const
 
@@ -29,6 +31,8 @@ export function preloadBackgroundAssets(scene: Phaser.Scene) {
   const base = 'assets/'
   const assets: [string, string][] = [
     [BG_ASSET_KEYS.skyHills,    'bg_sky_hills.png'],
+    [BG_ASSET_KEYS.ingameMount, 'ingame_mountain.png'],
+    [BG_ASSET_KEYS.homeMount,   'home_mountain.png'],
     [BG_ASSET_KEYS.treeOak,     'tree_oak.png'],
     [BG_ASSET_KEYS.treePine,    'tree_pine.png'],
     [BG_ASSET_KEYS.treeBush,    'tree_bush.png'],
@@ -55,10 +59,8 @@ export function drawBackgroundSprite(scene: Phaser.Scene) {
     scene.add.image(w / 2, h / 2, BG_ASSET_KEYS.skyHills)
       .setDisplaySize(w, h)
       .setDepth(0)
-    console.log('[BG] bg_sky_hills.png 사용')
   } else {
     drawFallbackSky(scene, w, h, groundY)
-    console.log('[BG] 배경 폴백 사용 (bg_sky_hills.png 없음)')
   }
 
   // ── 2. 풀/지면 레이어 ────────────────────────────────────────────────
@@ -72,10 +74,7 @@ export function drawBackgroundSprite(scene: Phaser.Scene) {
 
   // ── 3. 나무 (배치 포지션 고정) ──────────────────────────────────────
   const treeConfigs = [
-    // 원경 작은 나무
-    { x: w * 0.30, y: groundY, scale: 0.4, key: BG_ASSET_KEYS.treeOak,  depth: 5 },
-    { x: w * 0.55, y: groundY, scale: 0.38, key: BG_ASSET_KEYS.treePine, depth: 5 },
-    { x: w * 0.72, y: groundY, scale: 0.42, key: BG_ASSET_KEYS.treeOak,  depth: 5 },
+    // 원경 작은 나무 제거
     // 전경 큰 나무
     { x: w * 0.06, y: groundY, scale: 0.85, key: BG_ASSET_KEYS.treeOak,  depth: 7 },
     { x: w * 0.18, y: groundY, scale: 0.62, key: BG_ASSET_KEYS.treePine, depth: 7 },
