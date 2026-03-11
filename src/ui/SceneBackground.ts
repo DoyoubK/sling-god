@@ -292,7 +292,7 @@ function drawNearTrees(scene: Phaser.Scene, w: number, groundY: number) {
     { x: w*0.05,  s: 1.10, tint: 0xFFFFFF, flip: false, alpha: 0.80 },
     { x: w*0.17,  s: 0.78, tint: 0xDDF0DD, flip: true,  alpha: 0.74 },
     { x: w*0.88,  s: 1.15, tint: 0xFFFFFF, flip: true,  alpha: 0.80 },
-    { x: w*0.97,  s: 0.72, tint: 0xDDEEDD, flip: false, alpha: 0.35 },
+    { x: w*0.97,  s: 0.72, tint: 0xDDEEDD, flip: false, alpha: 0.63 },
   ]
   if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
     configs.forEach(({ x, s, tint, flip, alpha }) => {
