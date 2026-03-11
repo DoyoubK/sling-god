@@ -19,20 +19,38 @@ export class SoundManager {
   get muted() { return this.isMuted }
   toggleMute() { this.isMuted = !this.isMuted; return this.isMuted }
 
-  // ── 명중: 퍽! ──
+  // ── 명중: 딱! ──
   playHit() {
     if (this.isMuted) return
     const ctx = this.getCtx()
+    const t = ctx.currentTime
+
+    // 노이즈 버스트 (타격 질감)
+    const bufLen = ctx.sampleRate * 0.04
+    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate)
+    const data = buf.getChannelData(0)
+    for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1)
+    const noise = ctx.createBufferSource()
+    noise.buffer = buf
+    const noiseGain = ctx.createGain()
+    const noiseFilter = ctx.createBiquadFilter()
+    noiseFilter.type = 'highpass'
+    noiseFilter.frequency.value = 2000
+    noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(ctx.destination)
+    noiseGain.gain.setValueAtTime(0.6, t)
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04)
+    noise.start(t); noise.stop(t + 0.04)
+
+    // 고음 클릭 (딱! 핵심음)
     const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain); gain.connect(ctx.destination)
+    const oscGain = ctx.createGain()
+    osc.connect(oscGain); oscGain.connect(ctx.destination)
     osc.type = 'sine'
-    osc.frequency.setValueAtTime(180, ctx.currentTime)
-    osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.12)
-    gain.gain.setValueAtTime(0.5, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.15)
+    osc.frequency.setValueAtTime(900, t)
+    osc.frequency.exponentialRampToValueAtTime(300, t + 0.06)
+    oscGain.gain.setValueAtTime(0.5, t)
+    oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.07)
+    osc.start(t); osc.stop(t + 0.07)
   }
 
   // ── 클리어: 빠밤빠밤! 트럼펫 팡파레 ──
