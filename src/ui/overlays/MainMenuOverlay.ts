@@ -58,33 +58,50 @@ export class MainMenuOverlay extends HTMLOverlay {
 
     return `
       <!-- top spacer -->
-      <div style="flex:0 0 24px"></div>
+      <div style="flex:0 0 64px"></div>
 
       <!-- title card -->
       <div style="
-        background:rgba(26,42,58,0.88);
-        border:2.5px solid rgba(255,255,255,0.85);
-        border-radius:16px;
-        padding:22px 36px 18px;
-        text-align:center;
-        position:relative;
-        margin-top:0px;
+        background: linear-gradient(160deg, rgba(10,28,50,0.92) 0%, rgba(20,48,80,0.88) 100%);
+        border: 1.5px solid rgba(168,212,255,0.30);
+        border-radius: 24px;
+        padding: 26px 40px 22px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+        backdrop-filter: blur(8px);
       ">
-        <!-- corner dots -->
-        <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border-radius:50%;background:#F8D848;"></div>
-        <div style="position:absolute;top:-5px;right:-5px;width:10px;height:10px;border-radius:50%;background:#F8D848;"></div>
-        <div style="position:absolute;bottom:-5px;left:-5px;width:10px;height:10px;border-radius:50%;background:#F8D848;"></div>
-        <div style="position:absolute;bottom:-5px;right:-5px;width:10px;height:10px;border-radius:50%;background:#F8D848;"></div>
+        <!-- 상단 황금 장식선 -->
+        <div style="
+          position:absolute;top:0;left:50%;transform:translateX(-50%);
+          width:60%;height:2px;
+          background:linear-gradient(90deg,transparent,#F8D848,transparent);
+          border-radius:1px;
+        "></div>
 
-        <div style="font-size:42px;font-weight:700;color:#fff;line-height:1.1;
-          text-shadow:2px 2px 4px rgba(0,0,0,0.5);
-          font-family:'Pretendard',system-ui,sans-serif;">
-          새총의 신
-        </div>
-        <div style="font-size:14px;color:#A8D4F0;margin-top:8px;
-          font-family:'Pretendard',system-ui,sans-serif;">
-          날아가는 새를 맞혀라!
-        </div>
+        <!-- 메인 타이틀 -->
+        <div style="
+          font-size:46px;font-weight:900;line-height:1.0;
+          font-family:'Pretendard',system-ui,sans-serif;
+          background: linear-gradient(180deg, #FFFFFF 0%, #C8E8FF 60%, #8BC4F0 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          filter: drop-shadow(0 2px 8px rgba(49,130,246,0.5));
+          letter-spacing:-0.01em;
+        ">새총의 신</div>
+
+        <!-- 하단 장식선 -->
+        <div style="
+          width:40%;height:1px;margin:12px auto 10px;
+          background:linear-gradient(90deg,transparent,rgba(168,212,255,0.4),transparent);
+        "></div>
+
+        <div style="
+          font-size:13px;color:#A8D4F0;letter-spacing:0.04em;
+          font-family:'Pretendard',system-ui,sans-serif;
+        ">날아가는 새를 맞혀라!</div>
+
         ${bestBadge}
       </div>
 
@@ -94,24 +111,24 @@ export class MainMenuOverlay extends HTMLOverlay {
       <!-- bottom area -->
       <div style="
         display:flex;flex-direction:column;align-items:center;
-        gap:12px;padding-bottom:40px;width:100%;
+        gap:12px;padding-bottom:48px;width:100%;
       ">
         <button id="main-start-btn" style="
-          width:270px;height:56px;
-          background:#3182F6;color:#fff;
+          width:260px;height:56px;
+          background: linear-gradient(180deg, #4D9EFF 0%, #2570E8 100%);
+          color:#fff;
           font-size:18px;font-weight:700;
           font-family:'Pretendard',system-ui,sans-serif;
-          border:none;border-radius:28px;
+          border: none;
+          border-radius:28px;
           cursor:pointer;
-          box-shadow:0 4px 12px rgba(49,130,246,0.45);
-          letter-spacing:0.02em;
-        ">▶&nbsp; 게임 시작</button>
+          box-shadow: 0 4px 20px rgba(49,130,246,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+          letter-spacing:0.04em;
+        ">▶  게임 시작</button>
 
         <div style="
-          font-size:12px;color:#7CB3E0;
+          font-size:12px;color:rgba(124,179,224,0.7);letter-spacing:0.04em;
           font-family:'Pretendard',system-ui,sans-serif;
-        ">드래그로 조준  ✦  손 떼면 발사</div>
-      </div>
     `
   }
 }
