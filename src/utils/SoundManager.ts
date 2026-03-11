@@ -35,7 +35,7 @@ export class SoundManager {
     const noiseGain = ctx.createGain()
     const noiseFilter = ctx.createBiquadFilter()
     noiseFilter.type = 'highpass'
-    noiseFilter.frequency.value = 2000
+    noiseFilter.frequency.value = 800
     noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(ctx.destination)
     noiseGain.gain.setValueAtTime(0.6, t)
     noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04)
@@ -46,8 +46,8 @@ export class SoundManager {
     const oscGain = ctx.createGain()
     osc.connect(oscGain); oscGain.connect(ctx.destination)
     osc.type = 'sine'
-    osc.frequency.setValueAtTime(900, t)
-    osc.frequency.exponentialRampToValueAtTime(300, t + 0.06)
+    osc.frequency.setValueAtTime(400, t)
+    osc.frequency.exponentialRampToValueAtTime(120, t + 0.06)
     oscGain.gain.setValueAtTime(0.5, t)
     oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.07)
     osc.start(t); osc.stop(t + 0.07)
