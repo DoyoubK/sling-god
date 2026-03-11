@@ -205,38 +205,38 @@ export class Bird extends Phaser.GameObjects.Container {
     this.isHit = true
     this.vx = 0; this.vy = 0
 
-    // 눈X 표정: 새 크기에 맞게 X 오버레이
-    const eyeOffsetY = -this.cfg.displaySize * 0.15  // 눈 위치 (상단)
-    const xSize = this.cfg.displaySize * 0.22
 
-    const xg = this.scene.add.graphics()
-    // 흰색 테두리 (가독성)
-    xg.lineStyle(6, 0xFFFFFF, 0.9)
-    xg.beginPath(); xg.moveTo(-xSize, eyeOffsetY - xSize); xg.lineTo(xSize, eyeOffsetY + xSize); xg.strokePath()
-    xg.beginPath(); xg.moveTo(xSize, eyeOffsetY - xSize); xg.lineTo(-xSize, eyeOffsetY + xSize); xg.strokePath()
-    // 빨간 X
-    xg.lineStyle(4, 0xFF2222, 1)
-    xg.beginPath(); xg.moveTo(-xSize, eyeOffsetY - xSize); xg.lineTo(xSize, eyeOffsetY + xSize); xg.strokePath()
-    xg.beginPath(); xg.moveTo(xSize, eyeOffsetY - xSize); xg.lineTo(-xSize, eyeOffsetY + xSize); xg.strokePath()
 
-    // 별 이펙트 (명중 순간)
-    const starGfx = this.scene.add.graphics()
-    starGfx.fillStyle(0xFFFF00, 1)
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2
-      const r1 = xSize * 1.8, r2 = xSize * 0.9
-      starGfx.fillTriangle(
-        Math.cos(a) * r1, Math.sin(a) * r1,
-        Math.cos(a + Math.PI / 6) * r2, Math.sin(a + Math.PI / 6) * r2,
-        Math.cos(a - Math.PI / 6) * r2, Math.sin(a - Math.PI / 6) * r2,
-      )
-    }
-    starGfx.setPosition(0, eyeOffsetY)
-    starGfx.setDepth(19)
-    this.scene.tweens.add({ targets: starGfx, alpha: 0, scale: 2, duration: 400, onComplete: () => starGfx.destroy() })
 
-    this.add(xg)
-    this.setDepth(20)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     this.scene.tweens.add({
       targets: this,
