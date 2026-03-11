@@ -14,13 +14,13 @@ import { BG_ASSET_KEYS } from './SceneBackgroundSprite'
  *   7: 잔디 + 꽃
  *   8: 전경 나무
  */
-export function drawBackground(scene: Phaser.Scene, mountainKey?: string) {
+export function drawBackground(scene: Phaser.Scene) {
   const { width: w, height: h } = scene.scale
   const groundY = h * 0.76
 
   drawSky(scene, w, h, groundY)
   drawSunGlow(scene, w, h)
-  drawDistantMountains(scene, w, groundY, mountainKey)
+  drawDistantMountains(scene, w, groundY)
   drawClouds(scene, w, h)
   drawMidHills(scene, w, groundY)
   drawGround(scene, w, h, groundY)
@@ -96,26 +96,8 @@ function drawSunGlow(scene: Phaser.Scene, w: number, h: number) {
   })
 }
 
-// ── 원경 산맥 (이미지 우선, 폴백: Graphics) ──────────────────────────────
-function drawDistantMountains(scene: Phaser.Scene, w: number, groundY: number, mountainKey?: string) {
-  const mountKey = mountainKey ?? BG_ASSET_KEYS.ingameMount
-  if (scene.textures.exists(mountKey)) {
-    // 산 이미지 — 화면 너비 꽉 채우고, 하단을 groundY에 맞춤
-    const tex = scene.textures.get(mountKey)
-    const src = tex.getSourceImage() as HTMLImageElement
-    const imgW = src.naturalWidth  || src.width
-    const imgH = src.naturalHeight || src.height
-    const scale = w / imgW
-    const displayH = imgH * scale
-    scene.add.image(w / 2, groundY, BG_ASSET_KEYS.ingameMount)
-      .setDisplaySize(w, displayH)
-      .setOrigin(0.5, 1)   // 하단 기준 정렬
-      .setAlpha(0.55)       // 배경이 너무 진하지 않도록 투명도 조정
-      .setDepth(2)
-    return
-  }
-
-  // 폴백: Graphics 산
+// ── 원경 산맥 (대기 원근감) ────────────────────────────────────────────────
+function drawDistantMountains(scene: Phaser.Scene, w: number, groundY: number) {
   const g = scene.add.graphics().setDepth(2)
 
   // 레이어 1 — 가장 먼 산 (청회색)
@@ -134,6 +116,8 @@ function drawDistantMountains(scene: Phaser.Scene, w: number, groundY: number, m
   g.fillStyle(0xE8F4FF, 0.50)
   g.fillTriangle(w*0.22, groundY*0.50, w*0.25, groundY*0.40, w*0.28, groundY*0.50)
   g.fillTriangle(w*0.52, groundY*0.44, w*0.55, groundY*0.34, w*0.58, groundY*0.44)
+
+
 }
 
 // ── 구름 (그림자 레이어 포함, 유기적 형태) ───────────────────────────────
@@ -235,8 +219,8 @@ function drawFarTrees(scene: Phaser.Scene, w: number, groundY: number) {
   ]
   if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
     positions.forEach(({ x, s, tint, flip }) => {
-      // 나무 높이 기준 displayH 계산 (원본 1536px 높이) — 1.3배
-      const displayH = groundY * s * 0.26 * 1.3
+      // 나무 높이 기준 displayH 계산 (원본 1536px 높이)
+      const displayH = groundY * s * 0.26
       const displayW = displayH * (2816 / 1536)
       scene.add.image(x, groundY, BG_ASSET_KEYS.tree)
         .setDisplaySize(displayW, displayH)
@@ -248,7 +232,7 @@ function drawFarTrees(scene: Phaser.Scene, w: number, groundY: number) {
     })
   } else {
     const g = scene.add.graphics().setDepth(1)
-    positions.forEach(({ x, s }) => drawTree(g, x, groundY, s * 0.25 * 1.3, true))
+    positions.forEach(({ x, s }) => drawTree(g, x, groundY, s * 0.25, true))
   }
 }
 
@@ -289,12 +273,14 @@ function drawGrassDetail(scene: Phaser.Scene, w: number, groundY: number) {
 // ── 전경 나무 (근경, 크고 상세) ──────────────────────────────────────────
 function drawNearTrees(scene: Phaser.Scene, w: number, groundY: number) {
   const configs = [
-    { x: w*0.05,  s: 1.10, tint: 0xFFFFFF, flip: false, alpha: 0.80 },
-    { x: w*0.88,  s: 1.15, tint: 0xFFFFFF, flip: true,  alpha: 0.80 },
+    { x: w*0.05,  s: 1.10, tint: 0xFFFFFF, flip: false, alpha: 1.0 },
+    { x: w*0.17,  s: 0.78, tint: 0xDDF0DD, flip: true,  alpha: 0.92 },
+    { x: w*0.88,  s: 1.15, tint: 0xFFFFFF, flip: true,  alpha: 1.0 },
+    { x: w*0.97,  s: 0.72, tint: 0xDDEEDD, flip: false, alpha: 0.90 },
   ]
   if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
     configs.forEach(({ x, s, tint, flip, alpha }) => {
-      const displayH = groundY * s * 0.26 * 1.3
+      const displayH = groundY * s * 0.26
       const displayW = displayH * (2816 / 1536)
       scene.add.image(x, groundY, BG_ASSET_KEYS.tree)
         .setDisplaySize(displayW, displayH)
@@ -306,10 +292,10 @@ function drawNearTrees(scene: Phaser.Scene, w: number, groundY: number) {
     })
   } else {
     const g = scene.add.graphics().setDepth(3)
-    drawTree(g, w*0.05,  groundY, 0.28 * 1.3, false)
-    drawTree(g, w*0.17,  groundY, 0.20 * 1.3, false)
-    drawTree(g, w*0.88,  groundY, 0.29 * 1.3, false)
-    drawTree(g, w*0.97,  groundY, 0.18 * 1.3, false)
+    drawTree(g, w*0.05,  groundY, 0.28, false)
+    drawTree(g, w*0.17,  groundY, 0.20, false)
+    drawTree(g, w*0.88,  groundY, 0.29, false)
+    drawTree(g, w*0.97,  groundY, 0.18, false)
   }
 }
 
