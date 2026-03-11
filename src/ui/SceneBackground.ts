@@ -24,7 +24,7 @@ export function drawBackground(scene: Phaser.Scene, mountainKey?: string) {
   drawClouds(scene, w, h)
   drawMidHills(scene, w, groundY)
   drawGround(scene, w, h, groundY)
-  drawFarTrees(scene, w, groundY)
+  // drawFarTrees(scene, w, groundY)
   drawGrassDetail(scene, w, groundY)
   drawNearTrees(scene, w, groundY)
 }
