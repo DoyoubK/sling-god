@@ -76,13 +76,13 @@ export class MainMenuScene extends Phaser.Scene {
 
     // 원경 나무 (작고 흐리게)
     const farTrees = [
-      { x: w*0.12, s: 0.42 * 1.3, tint: 0x88B898, flip: false, alpha: 0.55 },
-      { x: w*0.82, s: 0.38 * 1.3, tint: 0x90C0A0, flip: true,  alpha: 0.50 },
+      { x: w*0.12, s: 0.42 * 1.3, tint: 0x88B898, flip: false, alpha: 0.45 },
+      { x: w*0.82, s: 0.38 * 1.3, tint: 0x90C0A0, flip: true,  alpha: 0.45 },
     ]
     // 전경 나무 (크고 선명하게)
     const nearTrees = [
-      { x: w*0.02,  s: 0.95 * 1.3, tint: 0xFFFFFF, flip: false, alpha: 0.80  },
-      { x: w*0.98,  s: 1.00 * 1.3, tint: 0xEEF8EE, flip: true,  alpha: 0.80  },
+      { x: w*0.02,  s: 0.95 * 1.3, tint: 0xFFFFFF, flip: false, alpha: 0.72  },
+      { x: w*0.98,  s: 1.00 * 1.3, tint: 0xEEF8EE, flip: true,  alpha: 0.72  },
     ]
 
     farTrees.forEach(({ x, s, tint, flip, alpha }) => {
@@ -116,11 +116,11 @@ export class MainMenuScene extends Phaser.Scene {
       y2 = Phaser.Math.Between(minY, maxY)
     }
 
-    const b1 = new Bird(this, w + 60, y1, 80, false)
+    const b1 = new Bird(this, w + 60, y1, 80, false, 10)
     b1.setDepth(9)
     this.menuBirds.push(b1)
 
-    const b2 = new Bird(this, -60, y2, 65, true)
+    const b2 = new Bird(this, -60, y2, 65, true, 10)
     b2.setDepth(9)
     this.menuBirds.push(b2)
 
@@ -153,7 +153,7 @@ export class MainMenuScene extends Phaser.Scene {
             }
             return ry
           })(),
-          Phaser.Math.Between(60, 100), goRight)
+          Phaser.Math.Between(60, 100), goRight, 10)
         nb.setDepth(9)
         this.menuBirds[i] = nb
       }

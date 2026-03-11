@@ -272,10 +272,10 @@ function drawGrassDetail(scene: Phaser.Scene, w: number, groundY: number) {
 // ── 전경 나무 (근경, 크고 상세) ──────────────────────────────────────────
 function drawNearTrees(scene: Phaser.Scene, w: number, groundY: number) {
   const configs = [
-    { x: w*0.05,  s: 1.10, tint: 0xFFFFFF, flip: false, alpha: 0.80 },
-    { x: w*0.17,  s: 0.78, tint: 0xDDF0DD, flip: true,  alpha: 0.92 },
-    { x: w*0.88,  s: 1.15, tint: 0xFFFFFF, flip: true,  alpha: 0.80 },
-    { x: w*0.97,  s: 0.72, tint: 0xDDEEDD, flip: false, alpha: 0.90 },
+    { x: w*0.05,  s: 1.10, tint: 0xFFFFFF, flip: false, alpha: 0.72 },
+    { x: w*0.17,  s: 0.78, tint: 0xDDF0DD, flip: true,  alpha: 0.83 },
+    { x: w*0.88,  s: 1.15, tint: 0xFFFFFF, flip: true,  alpha: 0.72 },
+    { x: w*0.97,  s: 0.72, tint: 0xDDEEDD, flip: false, alpha: 0.81 },
   ]
   if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
     configs.forEach(({ x, s, tint, flip, alpha }) => {
