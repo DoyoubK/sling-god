@@ -226,32 +226,6 @@ function drawGround(scene: Phaser.Scene, w: number, h: number, groundY: number) 
   g.fillRect(0, groundY, w, 2)
 }
 
-// ── 배경 나무 (원경, 작고 연한색) ─────────────────────────────────────────
-function drawFarTrees(scene: Phaser.Scene, w: number, groundY: number) {
-  const positions = [
-    { x: w*0.30, s: 0.50, tint: 0x8BBFA0, flip: false },
-    { x: w*0.48, s: 0.43, tint: 0x7EB898, flip: true  },
-    { x: w*0.65, s: 0.52, tint: 0x90C8A8, flip: false },
-  ]
-  if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
-    positions.forEach(({ x, s, tint, flip }) => {
-      // 나무 높이 기준 displayH 계산 (원본 1536px 높이) — 1.3배
-      const displayH = groundY * s * 0.26 * 1.3
-      const displayW = displayH * (2816 / 1536)
-      scene.add.image(x, groundY, BG_ASSET_KEYS.tree)
-        .setDisplaySize(displayW, displayH)
-        .setOrigin(0.5, 0.91)   // 나무 밑동 91% 기준
-        .setTint(tint)
-        .setFlipX(flip)
-        .setAlpha(0.60)
-        .setDepth(1)
-    })
-  } else {
-    const g = scene.add.graphics().setDepth(1)
-    positions.forEach(({ x, s }) => drawTree(g, x, groundY, s * 0.25 * 1.3, true))
-  }
-}
-
 // ── 잔디 + 꽃 디테일 ──────────────────────────────────────────────────────
 function drawGrassDetail(scene: Phaser.Scene, w: number, groundY: number) {
   const g = scene.add.graphics().setDepth(6)

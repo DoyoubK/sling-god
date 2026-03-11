@@ -101,6 +101,9 @@ export class MainMenuScene extends Phaser.Scene {
     })
   }
 
+  // 홈화면 새 등장 비율: 참새50% 비둘기15% 앵무새10% 부엉이15% 독수리10%
+  private readonly MENU_WEIGHTS = [50, 15, 10, 15, 10]
+
   private initFlyBird(w: number, h: number) {
     this.tweetTimer = 0; this.showTweet = false
     this.menuBirds = []
@@ -116,11 +119,11 @@ export class MainMenuScene extends Phaser.Scene {
       y2 = Phaser.Math.Between(minY, maxY)
     }
 
-    const b1 = new Bird(this, w + 60, y1, 80, false, 10)
+    const b1 = new Bird(this, w + 60, y1, 80, false, 1, this.MENU_WEIGHTS)
     b1.setDepth(9)
     this.menuBirds.push(b1)
 
-    const b2 = new Bird(this, -60, y2, 65, true, 10)
+    const b2 = new Bird(this, -60, y2, 65, true, 1, this.MENU_WEIGHTS)
     b2.setDepth(9)
     this.menuBirds.push(b2)
 
@@ -153,7 +156,7 @@ export class MainMenuScene extends Phaser.Scene {
             }
             return ry
           })(),
-          Phaser.Math.Between(60, 100), goRight, 10)
+          Phaser.Math.Between(60, 100), goRight, 1, this.MENU_WEIGHTS)
         nb.setDepth(9)
         this.menuBirds[i] = nb
       }

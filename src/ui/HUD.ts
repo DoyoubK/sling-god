@@ -7,22 +7,30 @@ export class HUD {
   private bg!: Phaser.GameObjects.Rectangle
   private levelText!: Phaser.GameObjects.Text
   private scoreText!: Phaser.GameObjects.Text
-  private missIcons: Phaser.GameObjects.GameObject[] = []
+  private missIcons: Phaser.GameObjects.Image[] = []
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
     const { width } = scene.scale
 
-    this.bg = scene.add.rectangle(width / 2, 40, width, 80, TDS.color.white).setDepth(10)
+    // 배경: 게임 하늘 색과 어울리는 반투명 다크 네이비
+    this.bg = scene.add.rectangle(width / 2, 40, width, 80, 0x0A1C32)
+      .setAlpha(0.72)
+      .setDepth(10)
+
+    // 하단 경계선 (미묘한 하이라이트)
+    scene.add.rectangle(width / 2, 80, width, 1.5, 0x3182F6)
+      .setAlpha(0.35)
+      .setDepth(10)
 
     this.levelText = scene.add.text(20, 20, '', {
-      fontSize: '18px', fontFamily: TDS.font.family,
-      color: TDS.color.css.dark, fontStyle: 'bold',
+      fontSize: '22px', fontFamily: TDS.font.family,
+      color: '#FFFFFF', fontStyle: 'bold',
     }).setDepth(11)
 
     this.scoreText = scene.add.text(width / 2, 20, '', {
-      fontSize: '18px', fontFamily: TDS.font.family,
-      color: TDS.color.css.blue, fontStyle: 'bold',
+      fontSize: '22px', fontFamily: TDS.font.family,
+      color: '#7EC8FF', fontStyle: 'bold',
     }).setOrigin(0.5, 0).setDepth(11)
   }
 
@@ -36,48 +44,28 @@ export class HUD {
     const { width } = this.scene.scale
     this.missIcons.forEach(i => i.destroy())
     this.missIcons = []
+
+    const SIZE = 32 * 1.6 * 1.2    // 표시 크기 (px, 1.2배 적용)
+    const IMG_W = 2816       // heart.png 원본 너비
+    const scale = SIZE / IMG_W
+
     for (let i = 0; i < GameManager.MAX_MISSES; i++) {
-      const x = width - 28 - i * 24
+      const x = width - 20 - i * (SIZE / 2 + 4)
       const y = 38
       const broken = i < currentMisses
-      const g = this.scene.add.graphics().setDepth(11)
-      this.drawHeart(g, x, y, broken)
-      this.missIcons.push(g)
-    }
-  }
 
-  private drawHeart(g: Phaser.GameObjects.Graphics, cx: number, cy: number, broken: boolean) {
-    const s = 18
-    if (broken) {
-      // 잃은 하트: 회색 테두리만
-      g.lineStyle(1.5, 0xAAAAAA, 0.6)
-      g.fillStyle(0xDDDDDD, 0.25)
-    } else {
-      // 남은 하트: 선명한 빨간 하트
-      g.fillStyle(0xFF1744, 1)
-    }
-    // 하트 경로: 두 원 + 삼각형 조합
-    g.fillCircle(cx - s*0.28, cy - s*0.05, s*0.38)
-    g.fillCircle(cx + s*0.28, cy - s*0.05, s*0.38)
-    // 하단 삼각형 (하트 뾰족한 부분)
-    g.fillTriangle(
-      cx - s*0.65, cy - s*0.05,
-      cx + s*0.65, cy - s*0.05,
-      cx,          cy + s*0.55
-    )
-    if (!broken) {
-      // 하이라이트
-      g.fillStyle(0xFF6B8A, 0.7)
-      g.fillCircle(cx - s*0.18, cy - s*0.18, s*0.18)
-    }
-    if (broken) {
-      g.strokeCircle(cx - s*0.28, cy - s*0.05, s*0.38)
-      g.strokeCircle(cx + s*0.28, cy - s*0.05, s*0.38)
-      g.strokeTriangle(
-        cx - s*0.65, cy - s*0.05,
-        cx + s*0.65, cy - s*0.05,
-        cx,          cy + s*0.55
-      )
+      const img = this.scene.add.image(x, y, 'heart')
+        .setScale(scale)
+        .setOrigin(0.5, 0.5)
+        .setDepth(11)
+
+      if (broken) {
+        // 흑백: 채도 제거 + 반투명
+        img.setTint(0x888888)
+        img.setAlpha(0.45)
+      }
+
+      this.missIcons.push(img)
     }
   }
 
@@ -85,7 +73,7 @@ export class HUD {
     this.bg.destroy()
     this.levelText.destroy()
     this.scoreText.destroy()
-    this.missIcons.forEach(i => (i as Phaser.GameObjects.Graphics).destroy())
+    this.missIcons.forEach(i => i.destroy())
     this.missIcons = []
   }
 }

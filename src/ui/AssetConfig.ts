@@ -9,6 +9,8 @@ export const Assets = {
   background: {
     /** 하늘 + 산 배경 (390×844, 불투명) */
     skyHills:    'assets/bg_sky_hills.png',
+    /** 인게임 산 배경 */
+    ingameMount: 'assets/ingame_mountain.png',
     midHills:    null as string | null,
   },
 

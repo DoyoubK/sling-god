@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(python3 -c \"\nfrom PIL import Image\nimg = Image.open\\('/Users/doyoubkwon/develop/sling-god/public/assets/sling_new.png'\\)\nprint\\(img.size\\)\n\")",
+      "Bash(python3 -c \"\nfrom PIL import Image\nimg = Image.open\\('/Users/doyoubkwon/develop/sling-god/public/assets/sling_new.png'\\)\nprint\\('size:', img.size\\)\nprint\\('mode:', img.mode\\)\n\")",
+      "Bash(python3 -c \"from PIL import Image; img = Image.open\\('/Users/doyoubkwon/develop/sling-god/public/assets/heart.png'\\); print\\(img.size\\)\")",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Read(//Users/doyoubkwon/.claude/**)",
+      "Bash(mkdir -p ~/.claude/skills)",
+      "Bash(cp -r /tmp/claude-app-in-toss-playbook ~/.claude/skills/ait-webview && ls ~/.claude/skills/ait-webview/)",
+      "Bash(pip3 install:*)",
+      "Bash(python3 -c \"from rembg import remove; print\\('rembg ok'\\)\")",
+      "Bash(python3 -c \"\nfrom rembg import remove\nfrom PIL import Image\nimport io\n\nwith open\\('/Users/doyoubkwon/develop/sling-god/public/assets/heart.png', 'rb'\\) as f:\n    data = f.read\\(\\)\n\nresult = remove\\(data\\)\nimg = Image.open\\(io.BytesIO\\(result\\)\\).convert\\('RGBA'\\)\nimg.save\\('/Users/doyoubkwon/develop/sling-god/public/assets/heart.png'\\)\nprint\\('완료, size:', img.size\\)\n\" 2>&1)",
+      "Bash(npm run:*)",
+      "WebSearch",
+      "WebFetch(domain:toss.im)"
+    ]
+  }
+}

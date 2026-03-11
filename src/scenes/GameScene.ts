@@ -17,9 +17,9 @@ const IMG_H    = 1536
 const ORIGIN_X = 0.50    // 손잡이 수평 중심 (50%)
 const ORIGIN_Y = 0.970   // 손잡이 하단 (97%)
 
-// 갈래 끝 고무줄 연결 지점 (픽셀 좌표)
-const L_FORK = { x: 1042, y:  77 }   // 왼쪽 갈래 내측 끝 (실측 37%, 5%)
-const R_FORK = { x: 1774, y:  77 }   // 오른쪽 갈래 내측 끝 (실측 63%, 5%)
+// 갈래 끝 고무줄 연결 지점 (픽셀 좌표) — sling.png 실측값
+const L_FORK = { x: 1132, y: 242 }   // 왼쪽 갈래 끝 (실측 40.2%, 15.8%)
+const R_FORK = { x: 1661, y: 231 }   // 오른쪽 갈래 끝 (실측 59.0%, 15.0%)
 // ──────────────────────────────────────────────────
 
 export class GameScene extends Phaser.Scene {
@@ -71,7 +71,23 @@ export class GameScene extends Phaser.Scene {
       this.load.image('stone', 'assets/stone.png')
     if (!this.textures.exists('sling'))
       this.load.image('sling', 'assets/sling.png')
-    // 새 이미지 로드
+    if (!this.textures.exists('heart'))
+      this.load.image('heart', 'assets/heart.png')
+    // 새 스프라이트시트 로드 (있으면 애니메이션, 없으면 단일 이미지 폴백)
+    const sheetMeta = [
+      { b: 'sparrow', fw: 1032, fh: 1024 },
+      { b: 'pigeon',  fw: 1032, fh: 1024 },
+      { b: 'parrot',  fw: 1032, fh: 1024 },
+      { b: 'owl',     fw: 1032, fh: 1024 },
+      { b: 'eagle',   fw: 1032, fh: 1024 },
+    ]
+    for (const { b, fw, fh } of sheetMeta) {
+      const sheetKey = `bird_${b}_sheet`
+      if (!this.textures.exists(sheetKey))
+        this.load.spritesheet(sheetKey, `assets/${b}_flying.png`, { frameWidth: fw, frameHeight: fh })
+    }
+
+    // 새 이미지 로드 (폴백용)
     const birds = ['sparrow', 'pigeon', 'parrot', 'owl', 'eagle']
     for (const b of birds) {
       const key = `bird_${b}_new`
@@ -154,20 +170,27 @@ export class GameScene extends Phaser.Scene {
     rb.clear()
     const sx = this.stoneX, sy = this.stoneY
 
-    // 고무줄 외곽 (두꺼운 어두운 선)
-    rb.lineStyle(5, 0x1A0A00, 0.9)
+    // 고무줄 — 왼쪽 (그림자 → 본체 → 하이라이트 3겹)
+    rb.lineStyle(7, 0x1A0A00, 0.55)
     rb.beginPath(); rb.moveTo(this.lfx, this.lfy); rb.lineTo(sx, sy); rb.strokePath()
+    rb.lineStyle(4.5, 0x8B4513, 1.0)
+    rb.beginPath(); rb.moveTo(this.lfx, this.lfy); rb.lineTo(sx, sy); rb.strokePath()
+    rb.lineStyle(1.5, 0xD2855A, 0.7)
+    rb.beginPath(); rb.moveTo(this.lfx, this.lfy); rb.lineTo(sx, sy); rb.strokePath()
+
+    // 고무줄 — 오른쪽 (그림자 → 본체 → 하이라이트 3겹)
+    rb.lineStyle(7, 0x1A0A00, 0.55)
+    rb.beginPath(); rb.moveTo(this.rfx, this.rfy); rb.lineTo(sx, sy); rb.strokePath()
+    rb.lineStyle(4.5, 0x8B4513, 1.0)
+    rb.beginPath(); rb.moveTo(this.rfx, this.rfy); rb.lineTo(sx, sy); rb.strokePath()
+    rb.lineStyle(1.5, 0xD2855A, 0.7)
     rb.beginPath(); rb.moveTo(this.rfx, this.rfy); rb.lineTo(sx, sy); rb.strokePath()
 
-    // 고무줄 내부 (밝은 갈색)
-    rb.lineStyle(3, 0x7B3B0A, 0.95)
-    rb.beginPath(); rb.moveTo(this.lfx, this.lfy); rb.lineTo(sx, sy); rb.strokePath()
-    rb.beginPath(); rb.moveTo(this.rfx, this.rfy); rb.lineTo(sx, sy); rb.strokePath()
-
-    // 파우치
-    rb.fillStyle(0x2A1200); rb.fillRect(sx - 8,  sy - 3,  16, 11)
-    rb.fillStyle(0x5C2800); rb.fillRect(sx - 6,  sy - 1,  12, 8)
-    rb.fillStyle(0x7A3A10); rb.fillRect(sx - 4,  sy,      8,  5)
+    // 파우치 (가죽 주머니)
+    rb.fillStyle(0x1A0A00, 0.9); rb.fillEllipse(sx, sy + 2, 22, 16)
+    rb.fillStyle(0x5C2800, 1.0); rb.fillEllipse(sx, sy,     20, 14)
+    rb.fillStyle(0x8B4513, 0.9); rb.fillEllipse(sx - 2, sy - 2, 12, 8)
+    rb.fillStyle(0xC07040, 0.5); rb.fillEllipse(sx - 3, sy - 3, 6,  4)
 
     // 돌 이미지 위치 업데이트 (파우치 중앙)
     if (this.stoneImg) this.stoneImg.setPosition(sx, sy - 8)
@@ -189,41 +212,49 @@ export class GameScene extends Phaser.Scene {
     g.clear()
     if (power < 0.03) return
 
-    // 새총 포크 중앙 위쪽에 반원 게이지
-    const cx = (this.lfx + this.rfx) / 2
-    const cy = (this.lfy + this.rfy) / 2 - 10
-    const R  = 38
+    // 갈래 두 끝점 사이 중앙, 바로 위
+    const cx  = (this.lfx + this.rfx) / 2
+    const cy  = (this.lfy + this.rfy) / 2 - 2
+    const R   = Math.sqrt(
+      (this.rfx - this.lfx) ** 2 + (this.rfy - this.lfy) ** 2
+    ) / 2 * 1.5
 
-    // 배경 트랙 (2/3 반원: 210°~330°)
-    g.lineStyle(5, 0x000000, 0.15)
+    // 왼쪽 끝점 → 오른쪽 끝점 방향 각도 계산
+    const angleToR = Math.atan2(this.rfy - this.lfy, this.rfx - this.lfx)
+    const angleDeg = Phaser.Math.RadToDeg(angleToR)
+
+    const midAngle = angleDeg - 90
+    const START    = midAngle - 45
+    const TOTAL    = 90
+
+    const THICK = 10
+    const pct   = Math.min(power, 1)
+
+    // 배경 트랙
+    g.lineStyle(THICK, 0x000000, 0.18)
     g.beginPath()
-    g.arc(cx, cy, R, Phaser.Math.DegToRad(210), Phaser.Math.DegToRad(330), false)
+    g.arc(cx, cy, R, Phaser.Math.DegToRad(START), Phaser.Math.DegToRad(START + TOTAL), false)
     g.strokePath()
 
-    // 채워진 게이지 (파워에 따라 색상 변화)
-    const pct    = Math.min(power, 1)
-    const endDeg = 210 + pct * 120
-    const color  = pct < 0.4 ? 0x44CC44
-                 : pct < 0.7 ? 0xFFAA00
-                 :              0xFF3322
+    // 채워진 게이지
+    const endDeg = START + pct * TOTAL
+    const color  = pct < 0.4 ? 0x22DD22
+                 : pct < 0.7 ? 0xFF8800
+                 :              0xFF1111
 
-    g.lineStyle(5, color, 0.92)
+    g.lineStyle(THICK, color, 0.95)
     g.beginPath()
-    g.arc(cx, cy, R, Phaser.Math.DegToRad(180), Phaser.Math.DegToRad(endDeg), false)
+    g.arc(cx, cy, R, Phaser.Math.DegToRad(START), Phaser.Math.DegToRad(endDeg), false)
     g.strokePath()
 
-    // 끝 점 (현재 파워 위치 동그라미)
+    // 끝점 동그라미
     const endRad = Phaser.Math.DegToRad(endDeg)
     const ex = cx + Math.cos(endRad) * R
     const ey = cy + Math.sin(endRad) * R
     g.fillStyle(color, 1)
-    g.fillCircle(ex, ey, 4)
-
-    // 파워 수치 (중앙 텍스트 대신 작은 점)
-    if (pct > 0.1) {
-      g.fillStyle(color, 0.7)
-      g.fillCircle(cx, cy - R - 8, 3)
-    }
+    g.fillCircle(ex, ey, 6)
+    g.fillStyle(0xFFFFFF, 0.6)
+    g.fillCircle(ex - 1, ey - 1, 2.5)
   }
 
   // ── 점선 궤적 ────────────────────────────────
@@ -253,15 +284,23 @@ export class GameScene extends Phaser.Scene {
     })
   }
 
-  // ── 새 스폰 ──────────────────────────────────
+  // ── 새 스폰 (겹침 방지) ─────────────────────
   private spawnBird() {
-    const goRight = Math.random() < 0.3   // 30% 확률로 왼→오
+    const goRight = Math.random() < 0.3
     const x = goRight ? -50 : this.scale.width + 50
-    // 상단 15% 제외, 나무 줄기 위(h*0.50) 이하에서만 비행
     const minY = Math.floor(this.scale.height * 0.15)
     const maxY = Math.floor(this.scale.height * 0.50)
-    const bird = new Bird(this, x,
-      Phaser.Math.Between(minY, maxY),
+    const MIN_DIST = 80   // 새 간 최소 Y 간격(px)
+
+    // 겹치지 않는 Y 좌표 찾기 (최대 10번 시도)
+    let y = Phaser.Math.Between(minY, maxY)
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const tooClose = this.birds.some(b => Math.abs(b.y - y) < MIN_DIST)
+      if (!tooClose) break
+      y = Phaser.Math.Between(minY, maxY)
+    }
+
+    const bird = new Bird(this, x, y,
       this.gm.getBirdSpeed(this.gm.currentLevel),
       goRight,
       this.gm.currentLevel)
@@ -389,9 +428,7 @@ export class GameScene extends Phaser.Scene {
     // 새 스폰 (화면에 한 마리만)
     if (!this.levelComplete && this.birds.length === 0) {
       this.birdSpawnTimer += delta
-      const interval = this.gm.currentLevel === 1
-        ? 5000
-        : Math.max(1200, 3000 - (this.gm.currentLevel - 2) * 200)
+      const interval = Math.max(800, 2500 - (this.gm.currentLevel - 1) * 200)
       if (this.birdSpawnTimer >= interval) {
         this.spawnBird(); this.birdSpawnTimer = 0
       }

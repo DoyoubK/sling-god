@@ -1,4 +1,3 @@
-import { SoundManager } from '../utils/SoundManager'
 import Phaser from 'phaser'
 import { GameManager } from '../utils/GameManager'
 import { TDS } from '../constants/TDS'

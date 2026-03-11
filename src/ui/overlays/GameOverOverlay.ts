@@ -12,7 +12,7 @@ interface GameOverCallbacks {
 
 /**
  * GameOverOverlay — HTML overlay for the game over screen.
- * Callbacks handle '광고 보고 이어하기' and '처음부터 다시' actions.
+ * Designed to match the LevelUpScene visual style (blue gradient + card + gold button).
  */
 export class GameOverOverlay extends HTMLOverlay {
   constructor() {
@@ -24,44 +24,35 @@ export class GameOverOverlay extends HTMLOverlay {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      background: 'rgba(12, 8, 18, 0.96)',
+      background: 'linear-gradient(180deg, #0A1A3A 0%, #1A0A2E 60%, #0A0A1A 100%)',
       pointerEvents: 'auto',
     })
 
-    // 애니메이션 스타일 주입
     const style = document.createElement('style')
     style.textContent = `
-      @keyframes missionSlideDown {
-        0%   { transform: translateY(-60px) scaleX(0.7); opacity: 0; }
-        60%  { transform: translateY(6px)   scaleX(1.04); opacity: 1; }
-        100% { transform: translateY(0)     scaleX(1); opacity: 1; }
+      @keyframes goFadeIn {
+        0%   { opacity: 0; transform: translateY(24px); }
+        100% { opacity: 1; transform: translateY(0); }
       }
-      @keyframes missionFadeUp {
-        0%   { transform: translateY(20px); opacity: 0; }
-        100% { transform: translateY(0);    opacity: 1; }
+      @keyframes goPop {
+        0%   { opacity: 0; transform: scale(0.2); }
+        60%  { transform: scale(1.08); }
+        100% { opacity: 1; transform: scale(1); }
       }
-      @keyframes missionPulse {
-        0%, 100% { box-shadow: 0 0 24px rgba(255,40,40,0.5), inset 0 1px 0 rgba(255,255,255,0.12); }
-        50%      { box-shadow: 0 0 48px rgba(255,40,40,0.9), inset 0 1px 0 rgba(255,255,255,0.12); }
+      @keyframes goFloat {
+        0%, 100% { transform: translateY(0px); }
+        50%      { transform: translateY(-6px); }
       }
-      @keyframes scanline {
-        0%   { transform: translateY(-100%); }
-        100% { transform: translateY(100vh); }
+      @keyframes goTwinkle {
+        0%, 100% { opacity: 0.15; }
+        50%      { opacity: 0.85; }
       }
-      .mission-fail-label {
-        animation: missionSlideDown 0.55s cubic-bezier(0.22,1,0.36,1) forwards,
-                   missionPulse 2s ease-in-out 0.6s infinite;
-      }
-      .mission-info {
-        animation: missionFadeUp 0.5s ease forwards;
-        opacity: 0;
-        animation-delay: 0.6s;
-      }
-      .mission-buttons {
-        animation: missionFadeUp 0.5s ease forwards;
-        opacity: 0;
-        animation-delay: 0.9s;
-      }
+      .go-label   { animation: goPop    0.45s cubic-bezier(0.34,1.56,0.64,1) 0.1s both; }
+      .go-info    { animation: goFadeIn 0.4s ease 0.5s both; }
+      .go-buttons { animation: goFadeIn 0.4s ease 0.8s both; }
+      .go-float   { animation: goFloat 1.8s ease-in-out infinite; }
+      #go-ad-btn:active      { transform: scale(0.96); }
+      #go-restart-btn:active { transform: scale(0.96); }
     `
     document.head.appendChild(style)
   }
@@ -69,7 +60,7 @@ export class GameOverOverlay extends HTMLOverlay {
   showWithData(data: GameOverData, callbacks: GameOverCallbacks) {
     this.el.innerHTML = this.buildHTML(data)
 
-    const adBtn = this.el.querySelector<HTMLButtonElement>('#go-ad-btn')!
+    const adBtn      = this.el.querySelector<HTMLButtonElement>('#go-ad-btn')!
     const restartBtn = this.el.querySelector<HTMLButtonElement>('#go-restart-btn')!
 
     adBtn.addEventListener('click', () => {
@@ -85,95 +76,48 @@ export class GameOverOverlay extends HTMLOverlay {
   }
 
   private buildHTML(data: GameOverData): string {
+    const decos = [
+      { e: '💀', l: '8%',  t: '10%', delay: '0s',    size: '20px' },
+      { e: '🔥', l: '84%', t: '13%', delay: '0.15s', size: '18px' },
+      { e: '❌', l: '5%',  t: '46%', delay: '0.3s',  size: '16px' },
+      { e: '💀', l: '88%', t: '42%', delay: '0.45s', size: '20px' },
+      { e: '🔥', l: '10%', t: '76%', delay: '0.6s',  size: '18px' },
+      { e: '❌', l: '82%', t: '72%', delay: '0.75s', size: '16px' },
+      { e: '💀', l: '47%', t: '6%',  delay: '0.9s',  size: '18px' },
+      { e: '🔥', l: '45%', t: '88%', delay: '1.05s', size: '16px' },
+    ]
+
+    const decoHTML = decos.map(d => `
+      <div style="position:absolute;left:${d.l};top:${d.t};font-size:${d.size};opacity:0;animation:goTwinkle 1.2s ease-in-out ${d.delay} infinite;pointer-events:none;">${d.e}</div>
+    `).join('')
+
     return `
-      <!-- 스캔라인 효과 -->
-      <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;">
-        <div style="
-          position:absolute;left:0;right:0;height:2px;
-          background:rgba(255,255,255,0.04);
-          animation: scanline 3s linear infinite;
-        "></div>
+      <div style="position:absolute;inset:0;pointer-events:none;z-index:0;">${decoHTML}</div>
+
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,#6A3EE8,transparent);z-index:1;"></div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0;text-align:center;padding:0 32px;position:relative;z-index:2;width:100%;">
+
+        <div class="go-label" style="font-size:40px;font-weight:900;font-family:'Pretendard',system-ui,sans-serif;color:#FF6B6B;letter-spacing:0.08em;text-shadow:0 0 20px rgba(255,80,80,0.7),0 2px 8px rgba(0,0,0,0.6);">💀 미션 실패</div>
+
+        <div class="go-info" style="margin-top:12px;">
+          <div style="font-size:52px;font-weight:900;color:#FFFFFF;font-family:'Pretendard',system-ui,sans-serif;text-shadow:0 2px 12px rgba(0,0,0,0.5);">Level ${data.level}</div>
+        </div>
+
+        <div class="go-info" style="margin-top:20px;width:76%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.18);border-radius:14px;padding:16px 0;">
+          <div style="font-size:22px;font-weight:700;color:#FFFFFF;font-family:'Pretendard',system-ui,sans-serif;">명중 ${data.hits}마리</div>
+          <div style="margin-top:8px;font-size:14px;color:rgba(255,180,180,0.85);font-family:'Pretendard',system-ui,sans-serif;">하트가 모두 소진되었습니다</div>
+        </div>
+
+        <div class="go-buttons go-float" style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:36px;width:100%;">
+          <button id="go-ad-btn" style="width:72%;max-width:280px;height:56px;background:linear-gradient(180deg,#FFD740 0%,#FFB300 100%);color:#7A4800;font-size:18px;font-weight:700;font-family:'Pretendard',system-ui,sans-serif;border:none;border-radius:28px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,0.3),0 0 16px rgba(255,200,0,0.3);letter-spacing:0.02em;transition:transform 0.1s;">📺&nbsp; 광고 보고 이어하기</button>
+          <button id="go-restart-btn" style="width:72%;max-width:280px;height:50px;background:rgba(255,255,255,0.07);color:rgba(220,220,255,0.8);font-size:15px;font-weight:600;font-family:'Pretendard',system-ui,sans-serif;border:1.5px solid rgba(255,255,255,0.18);border-radius:25px;cursor:pointer;transition:transform 0.1s;">처음부터 다시</button>
+        </div>
+
+        <div style="font-size:12px;color:rgba(160,160,200,0.55);margin-top:18px;font-family:'Pretendard',system-ui,sans-serif;">⏳ 또는 15분 후 자동 충전</div>
       </div>
 
-      <!-- 상단 빨간 줄 -->
-      <div style="
-        position:absolute;top:0;left:0;right:0;height:4px;
-        background:linear-gradient(90deg,transparent,#FF3C3C,transparent);z-index:1;
-      "></div>
-
-      <!-- 중앙 콘텐츠 -->
-      <div style="
-        display:flex;flex-direction:column;align-items:center;
-        gap:0;text-align:center;padding:0 32px;position:relative;z-index:2;
-      ">
-        <div style="font-size:52px;line-height:1;">💀</div>
-
-        <!-- 미션 실패 배너 -->
-        <div class="mission-fail-label" style="
-          margin-top:20px;
-          background:linear-gradient(180deg,#FF3C3C 0%,#C01010 100%);
-          border:1.5px solid rgba(255,120,120,0.4);
-          border-radius:6px;padding:10px 36px;
-        ">
-          <div style="
-            font-size:30px;font-weight:900;color:#FFFFFF;
-            font-family:'Pretendard',system-ui,sans-serif;
-            letter-spacing:0.12em;
-          ">미션 실패</div>
-        </div>
-
-        <!-- 레벨 / 명중 정보 -->
-        <div class="mission-info" style="margin-top:28px;">
-          <div style="
-            font-size:16px;color:rgba(180,180,180,0.85);
-            font-family:'Pretendard',system-ui,sans-serif;letter-spacing:0.04em;
-          ">Lv.${data.level} 도전 &nbsp;·&nbsp; 명중 ${data.hits}마리</div>
-
-          <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;align-items:center;">
-            <span style="font-size:22px;opacity:0.25;">🖤</span>
-            <span style="font-size:22px;opacity:0.25;">🖤</span>
-            <span style="font-size:22px;opacity:0.25;">🖤</span>
-          </div>
-
-          <div style="
-            margin-top:10px;font-size:13px;color:rgba(255,90,90,0.8);
-            font-family:'Pretendard',system-ui,sans-serif;
-          ">하트가 모두 소진되었습니다</div>
-        </div>
-
-        <!-- 버튼 -->
-        <div class="mission-buttons" style="
-          display:flex;flex-direction:column;align-items:center;
-          gap:12px;margin-top:36px;width:100%;
-        ">
-          <button id="go-ad-btn" style="
-            width:280px;height:56px;
-            background:linear-gradient(180deg,#4D9EFF 0%,#2570E8 100%);
-            color:#fff;font-size:17px;font-weight:700;
-            font-family:'Pretendard',system-ui,sans-serif;
-            border:none;border-radius:28px;cursor:pointer;
-            box-shadow:0 4px 16px rgba(49,130,246,0.45);letter-spacing:0.02em;
-          ">📺&nbsp; 광고 보고 이어하기</button>
-
-          <button id="go-restart-btn" style="
-            width:280px;height:52px;background:transparent;
-            color:rgba(180,180,180,0.75);font-size:15px;font-weight:600;
-            font-family:'Pretendard',system-ui,sans-serif;
-            border:1px solid rgba(180,180,180,0.2);border-radius:26px;cursor:pointer;
-          ">처음부터 다시</button>
-        </div>
-
-        <div style="
-          font-size:12px;color:rgba(120,120,120,0.6);margin-top:20px;
-          font-family:'Pretendard',system-ui,sans-serif;
-        ">⏳ 또는 15분 후 자동 충전</div>
-      </div>
-
-      <!-- 하단 빨간 줄 -->
-      <div style="
-        position:absolute;bottom:0;left:0;right:0;height:4px;
-        background:linear-gradient(90deg,transparent,#FF3C3C,transparent);z-index:1;
-      "></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,#6A3EE8,transparent);z-index:1;"></div>
     `
   }
 }

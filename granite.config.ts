@@ -5,7 +5,7 @@ export default defineConfig({
   brand: {
     displayName: '새총의 신',
     primaryColor: '#3182F6',
-    icon: 'https://static.toss.im/appsintoss/0000/granite.png',
+    icon: './public/assets/sling_god.png',
   },
   web: {
     host: 'localhost',
