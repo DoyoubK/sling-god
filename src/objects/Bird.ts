@@ -18,10 +18,10 @@ interface BirdConfig {
 
 const BIRD_CONFIGS: Record<BirdType, BirdConfig> = {
   sparrow: { displaySize: 64,  speedMult: 0.48, hitRadius: 32, wingSpeed: 14, wingAmp: 8,  textureKey: 'bird_sparrow_new', sheetKey: 'bird_sparrow_sheet', frameWidth: 1032, frameHeight: 1024, frameRate: 10 },
-  pigeon:  { displaySize: 72,  speedMult: 0.8, hitRadius: 36, wingSpeed: 11, wingAmp: 10, textureKey: 'bird_pigeon_new',  sheetKey: 'bird_pigeon_sheet',  frameWidth: 1032, frameHeight: 1024, frameRate: 9  },
-  parrot:  { displaySize: 72,  speedMult: 1.0, hitRadius: 36, wingSpeed: 12, wingAmp: 9,  textureKey: 'bird_parrot_new',  sheetKey: 'bird_parrot_sheet',  frameWidth: 1032, frameHeight: 1024, frameRate: 10 },
-  owl:     { displaySize: 80,  speedMult: 1.3, hitRadius: 40, wingSpeed: 7,  wingAmp: 12, textureKey: 'bird_owl_new',     sheetKey: 'bird_owl_sheet',     frameWidth: 1032, frameHeight: 1024, frameRate: 7  },
-  eagle:   { displaySize: 92,  speedMult: 1.7, hitRadius: 46, wingSpeed: 5,  wingAmp: 16, textureKey: 'bird_eagle_new',   sheetKey: 'bird_eagle_sheet',   frameWidth: 1032, frameHeight: 1024, frameRate: 6  },
+  pigeon:  { displaySize: 72,  speedMult: 0.64, hitRadius: 36, wingSpeed: 11, wingAmp: 10, textureKey: 'bird_pigeon_new',  sheetKey: 'bird_pigeon_sheet',  frameWidth: 1032, frameHeight: 1024, frameRate: 9  },
+  parrot:  { displaySize: 72,  speedMult: 0.8, hitRadius: 36, wingSpeed: 12, wingAmp: 9,  textureKey: 'bird_parrot_new',  sheetKey: 'bird_parrot_sheet',  frameWidth: 1032, frameHeight: 1024, frameRate: 10 },
+  owl:     { displaySize: 80,  speedMult: 1.04, hitRadius: 40, wingSpeed: 7,  wingAmp: 12, textureKey: 'bird_owl_new',     sheetKey: 'bird_owl_sheet',     frameWidth: 1032, frameHeight: 1024, frameRate: 7  },
+  eagle:   { displaySize: 92,  speedMult: 1.36, hitRadius: 46, wingSpeed: 5,  wingAmp: 16, textureKey: 'bird_eagle_new',   sheetKey: 'bird_eagle_sheet',   frameWidth: 1032, frameHeight: 1024, frameRate: 6  },
 }
 
 export class Bird extends Phaser.GameObjects.Container {
