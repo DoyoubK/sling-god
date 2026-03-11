@@ -266,31 +266,16 @@ function drawGrassDetail(scene: Phaser.Scene, w: number, groundY: number) {
     g.fillTriangle(x+4, groundY, x+6, groundY, x+5, groundY-h2)
   }
 
-  // 꽃 (불규칙 배치)
-  const flowers = [
-    { x: w*0.22, c: 0xFFD700 }, { x: w*0.38, c: 0xFF8EC8 },
-    { x: w*0.52, c: 0xFFFFFF }, { x: w*0.64, c: 0xFF6B9D },
-    { x: w*0.79, c: 0xFFD700 }, { x: w*0.42, c: 0xFFB3DE },
-  ]
-  flowers.forEach(({ x, c }) => {
-    const fy = groundY - 8
-    g.fillStyle(0x2A7010)
-    g.fillRect(x, fy, 1.5, 8)
-    g.fillStyle(c, 0.95)
-    g.fillCircle(x,   fy-3, 3.5)
-    g.fillCircle(x-3, fy,   3)
-    g.fillCircle(x+3, fy,   3)
-    g.fillCircle(x,   fy+3, 3)
-    g.fillStyle(0xFFFF88)
-    g.fillCircle(x, fy, 2)
-  })
+
 }
 
 // ── 전경 나무 (근경, 크고 상세) ──────────────────────────────────────────
 function drawNearTrees(scene: Phaser.Scene, w: number, groundY: number) {
   const configs = [
     { x: w*0.05,  s: 1.10, tint: 0xFFFFFF, flip: false, alpha: 0.80 },
+    { x: w*0.17,  s: 0.78, tint: 0xDDF0DD, flip: true,  alpha: 0.92 },
     { x: w*0.88,  s: 1.15, tint: 0xFFFFFF, flip: true,  alpha: 0.80 },
+    { x: w*0.97,  s: 0.72, tint: 0xDDEEDD, flip: false, alpha: 0.90 },
   ]
   if (scene.textures.exists(BG_ASSET_KEYS.tree)) {
     configs.forEach(({ x, s, tint, flip, alpha }) => {

@@ -76,7 +76,8 @@ export class MainMenuScene extends Phaser.Scene {
 
     // 원경 나무 (작고 흐리게)
     const farTrees = [
-      
+      { x: w*0.12, s: 0.42 * 1.3, tint: 0x88B898, flip: false, alpha: 0.55 },
+      { x: w*0.82, s: 0.38 * 1.3, tint: 0x90C0A0, flip: true,  alpha: 0.50 },
     ]
     // 전경 나무 (크고 선명하게)
     const nearTrees = [
