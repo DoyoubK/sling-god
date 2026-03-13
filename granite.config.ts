@@ -5,7 +5,7 @@ export default defineConfig({
   brand: {
     displayName: '새총의 신',
     primaryColor: '#3182F6',
-    icon: './public/assets/sling_god.png',
+    icon: 'https://static.toss.im/appsintoss/0000/granite.png',
   },
   web: {
     host: 'localhost',
@@ -14,6 +14,12 @@ export default defineConfig({
       dev: 'vite',
       build: 'vite build',
     },
+  },
+  webViewProps: {
+    type: 'game',
+    bounces: false,
+    pullToRefreshEnabled: false,
+    mediaPlaybackRequiresUserAction: false,
   },
   permissions: [],
   navigationBar: {
